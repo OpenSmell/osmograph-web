@@ -54,7 +54,7 @@ function formatDuration(samples: number, rate: number): string {
   return `${s.toFixed(1)} s`
 }
 
-export default function MoxStudio() {
+export default function MoxWeb() {
   const [status, setStatus] = React.useState<ImportStatus>("idle")
   const [error, setError] = React.useState<string | null>(null)
   const [file, setFile] = React.useState<OsmellFile | null>(null)
@@ -168,7 +168,7 @@ export default function MoxStudio() {
             <span className="hex-icon text-foreground" />
             <span className="text-sm font-semibold tracking-tight">OpenSmell</span>
             <span className="text-sm text-muted-foreground">/</span>
-            <span className="text-sm text-muted-foreground">Studio</span>
+            <span className="text-sm text-muted-foreground">Web</span>
           </div>
           <nav className="flex items-center gap-1 text-sm text-muted-foreground">
             <Button variant="ghost" size="sm">mox.opensmell.xyz</Button>

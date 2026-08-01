@@ -8,9 +8,9 @@ const geist = Geist({ subsets: ["latin"], variable: "--font-geist-sans" })
 const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono" })
 
 export const metadata: Metadata = {
-  title: "OpenSmell Studio — mox.opensmell.xyz",
+  title: "Osmograph Web — mox.opensmell.xyz",
   description:
-    "OpenSmell Studio is the web platform for MOX e-nose sensor data. Import loose CSVs, normalize baseline, score data quality, and export the .osmell format.",
+    "Osmograph Web is the web platform for MOX e-nose sensor data. Import loose CSVs, normalize baseline, score data quality, and export the .osmell format.",
   icons: {
     icon: "/opensmell_logo.png",
     apple: "/opensmell_logo.png",

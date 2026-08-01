@@ -1,12 +1,12 @@
 import type { Metadata } from "next"
-import MoxStudio from "@/components/mox/mox-studio"
+import MoxWeb from "@/components/mox/mox-web"
 
 export const metadata: Metadata = {
-  title: "OpenSmell Studio — MOX sensor analytics",
+  title: "Osmograph Web — MOX sensor analytics",
   description:
     "Import MOX e-nose CSVs, normalize against a baseline, score data quality, and export .osmell files.",
 }
 
 export default function MoxPage() {
-  return <MoxStudio />
+  return <MoxWeb />
 }

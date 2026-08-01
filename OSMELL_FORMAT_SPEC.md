@@ -41,7 +41,7 @@ conventions* and the *quality scoring rules*, not in a binary envelope.
 4. **Rigorously documented.** Every header, unit, and scoring formula is
    defined below with no hidden magic numbers.
 5. **Easy.** Creating a file is one ZIP write; reading it is one ZIP read plus
-   one CSV parse. The Import Wizard in OpenSmell Studio produces valid files
+   one CSV parse. The Import Wizard in Osmograph Web produces valid files
    from loose vendor CSVs in a few clicks.
 
 ### 1.2 Format at a glance
@@ -134,7 +134,7 @@ compatibility).
   },
   "software": {
     "recorder": "Osmograph 0.4.0",
-    "importer": "OpenSmell Studio 0.1.0"
+    "importer": "Osmograph Web 0.1.0"
   }
 }
 ```
@@ -298,7 +298,7 @@ detection, no midpoint-splitting heuristics, no guessing.
 ### 5.2 Import Wizard accommodation (single files)
 
 When a user only has one continuous file that contains baseline-then-exposure,
-OpenSmell Studio's Import Wizard performs an explicit **midpoint split** at a
+Osmograph Web's Import Wizard performs an explicit **midpoint split** at a
 user-confirmed boundary and writes *two* `.osmell` files with a shared
 `groupId`. The split boundary is always human-confirmed; the software never
 auto-detects phases.
@@ -563,7 +563,7 @@ A conforming **writer** MUST:
 | -------------- | ---------------------------------- | --------- |
 | Osmograph desktop (Python) | `github.com/opensmell/osmograph`  | Current recorder; emits legacy CSV, upgraded via Import Wizard. |
 | OpenSmell SDK (Python)     | `opensmell/opensmell`             | Feature framework; consumes CSV.      |
-| OpenSmell Studio (TypeScript) | this repository (`osmograph-web`) | Reference parser, scorer, writer.    |
+| Osmograph Web (TypeScript) | this repository (`osmograph-web`) | Reference parser, scorer, writer.    |
 
 ---
 

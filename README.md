@@ -1,4 +1,4 @@
-# OpenSmell Studio (osmograph-web)
+# Osmograph Web (osmograph-web)
 
 The web analytics platform for MOX e-nose sensor data, served at
 **mox.opensmell.xyz**. Import loose CSVs, normalize against a baseline, score
