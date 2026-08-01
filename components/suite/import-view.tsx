@@ -24,14 +24,74 @@ import { SessionDetail, downloadOsmell } from "@/components/suite/session-cards"
 
 type ImportStatus = "idle" | "uploading" | "processing" | "ready" | "error"
 
+type ImportResult =
+  | {
+      status: "ok"
+      fileName: string
+      file: OsmellFile
+      report: QualityReport
+      features: MoxFeatures[] | null
+    }
+  | { status: "error"; fileName: string; error: string }
+
+async function processFile(f: File): Promise<{ file: OsmellFile; report: QualityReport; mox: ReturnType<typeof processMox> }> {
+  const text = await f.text()
+  if (f.name.toLowerCase().endsWith(".osmell")) {
+    const buf = await f.arrayBuffer()
+    const { parseOsmell } = await import("@/lib/osmell")
+    const parsed = await parseOsmell(buf)
+    const report = computeQuality({
+      file: parsed,
+      sampleCount: parsed.time.length,
+      guessSamplingRateHz: parsed.manifest.sensor.samplingRateHz ?? 10,
+      unsorted: false,
+      nonFinite: 0,
+    })
+    return { file: parsed, report, mox: processMox(parsed) }
+  }
+  const parsed = parseCsv(text)
+  if (parsed.samples.length === 0) {
+    throw new Error("No valid data rows found in the CSV.")
+  }
+  const channelIds = parsed.channelIds
+  const manifest: OsmellFile["manifest"] = {
+    osmell: { formatVersion: "1.0.0" },
+    sensor: {
+      sensorType: "mox",
+      channels: channelIds.map((id) => ({ id, unit: "adc" })),
+      samplingRateHz: parsed.guessSamplingRateHz || undefined,
+      adcBits: 12,
+      adcMax: 4095,
+      timeColumn: parsed.timeColumn,
+    },
+    session: { role: "exposure", label: f.name.replace(/\.(csv|txt)$/i, "") },
+    baseline: { source: "auto", r0Samples: 15 },
+  }
+  const data: Record<string, number[]> = {}
+  for (const id of channelIds) {
+    data[id] = parsed.samples.map((s) => s.values[id] ?? NaN)
+  }
+  const file: OsmellFile = {
+    manifest,
+    time: parsed.samples.map((s) => s.time),
+    data,
+  }
+  const report = computeQuality({
+    file,
+    sampleCount: parsed.samples.length,
+    guessSamplingRateHz: parsed.guessSamplingRateHz,
+    unsorted: parsed.unsorted,
+    nonFinite: parsed.nonFinite,
+  })
+  return { file, report, mox: processMox(file) }
+}
+
 export function ImportView() {
   const { addSession } = useSessions()
   const [status, setStatus] = React.useState<ImportStatus>("idle")
   const [error, setError] = React.useState<string | null>(null)
-  const [file, setFile] = React.useState<OsmellFile | null>(null)
-  const [report, setReport] = React.useState<QualityReport | null>(null)
-  const [features, setFeatures] = React.useState<MoxFeatures[] | null>(null)
-  const [filename, setFilename] = React.useState("")
+  const [results, setResults] = React.useState<ImportResult[]>([])
+  const [progress, setProgress] = React.useState<{ done: number; total: number } | null>(null)
   const [dragOver, setDragOver] = React.useState(false)
   const inputRef = React.useRef<HTMLInputElement>(null)
 
@@ -39,104 +99,56 @@ export function ImportView() {
     async (files: FileList | File[]) => {
       const list = Array.from(files)
       if (list.length === 0) return
-      const f = list[0]
       setStatus("uploading")
       setError(null)
-      try {
-        const text = await f.text()
-        setStatus("processing")
-        if (f.name.toLowerCase().endsWith(".osmell")) {
-          const buf = await f.arrayBuffer()
-          const { parseOsmell } = await import("@/lib/osmell")
-          const parsed = await parseOsmell(buf)
-          const rep = computeQuality({
-            file: parsed,
-            sampleCount: parsed.time.length,
-            guessSamplingRateHz: parsed.manifest.sensor.samplingRateHz ?? 10,
-            unsorted: false,
-            nonFinite: 0,
-          })
-          const mox = processMox(parsed)
-          setFile(parsed)
-          setFilename(f.name)
-          setReport(rep)
-          setFeatures(mox.sensorType === "mox" ? mox.features : null)
+      setResults([])
+      setProgress({ done: 0, total: list.length })
+      const out: ImportResult[] = []
+      for (const f of list) {
+        try {
+          const { file, report, mox } = await processFile(f)
           addSession({
             id: makeSessionId(),
             fileName: f.name,
-            file: parsed,
-            report: rep,
+            file,
+            report,
             features: mox.sensorType === "mox" ? mox.features : null,
             importedAt: Date.now(),
           })
-          setStatus("ready")
-          return
+          out.push({
+            status: "ok",
+            fileName: f.name,
+            file,
+            report,
+            features: mox.sensorType === "mox" ? mox.features : null,
+          })
+        } catch (e) {
+          out.push({
+            status: "error",
+            fileName: f.name,
+            error: e instanceof Error ? e.message : "Failed to parse file.",
+          })
         }
-        const parsed = parseCsv(text)
-        if (parsed.samples.length === 0) {
-          throw new Error("No valid data rows found in the CSV.")
-        }
-        const channelIds = parsed.channelIds
-        const manifest: OsmellFile["manifest"] = {
-          osmell: { formatVersion: "1.0.0" },
-          sensor: {
-            sensorType: "mox",
-            channels: channelIds.map((id) => ({ id, unit: "adc" })),
-            samplingRateHz: parsed.guessSamplingRateHz || undefined,
-            adcBits: 12,
-            adcMax: 4095,
-            timeColumn: parsed.timeColumn,
-          },
-          session: { role: "exposure", label: f.name.replace(/\.(csv|txt)$/i, "") },
-          baseline: { source: "auto", r0Samples: 15 },
-        }
-        const data: Record<string, number[]> = {}
-        for (const id of channelIds) {
-          data[id] = parsed.samples.map((s) => s.values[id] ?? NaN)
-        }
-        const osmellFile: OsmellFile = {
-          manifest,
-          time: parsed.samples.map((s) => s.time),
-          data,
-        }
-        const rep = computeQuality({
-          file: osmellFile,
-          sampleCount: parsed.samples.length,
-          guessSamplingRateHz: parsed.guessSamplingRateHz,
-          unsorted: parsed.unsorted,
-          nonFinite: parsed.nonFinite,
-        })
-        const mox = processMox(osmellFile)
-        setFile(osmellFile)
-        setFilename(f.name)
-        setReport(rep)
-        setFeatures(mox.sensorType === "mox" ? mox.features : null)
-        addSession({
-          id: makeSessionId(),
-          fileName: f.name,
-          file: osmellFile,
-          report: rep,
-          features: mox.sensorType === "mox" ? mox.features : null,
-          importedAt: Date.now(),
-        })
-        setStatus("ready")
-      } catch (e) {
-        setStatus("error")
-        setError(e instanceof Error ? e.message : "Failed to parse file.")
+        setProgress((p) => (p ? { done: p.done + 1, total: p.total } : p))
       }
+      setResults(out)
+      setProgress(null)
+      setStatus("ready")
     },
     [addSession],
   )
 
   const reset = React.useCallback(() => {
     setStatus("idle")
-    setFile(null)
-    setReport(null)
-    setFeatures(null)
+    setResults([])
     setError(null)
-    setFilename("")
+    setProgress(null)
     if (inputRef.current) inputRef.current.value = ""
   }, [])
+
+  const okResults = results.filter((r): r is Extract<ImportResult, { status: "ok" }> => r.status === "ok")
+  const errResults = results.filter((r): r is Extract<ImportResult, { status: "error" }> => r.status === "error")
+  const single = okResults.length === 1 ? okResults[0] : null
 
   return (
     <div className="flex flex-col gap-6">
@@ -144,12 +156,12 @@ export function ImportView() {
         <Badge variant="secondary" className="w-fit">
           <Sparkles className="size-3" /> Import
         </Badge>
-        <h1 className="text-2xl font-semibold tracking-tight">Add a recording</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Add recordings</h1>
         <p className="max-w-2xl text-muted-foreground">
-          Drop a CSV from your Osmograph, ESP32, or any MOX array — or an existing{" "}
-          <code className="rounded bg-muted px-1 py-0.5 text-xs">.osmell</code> file. We
-          detect channels, normalize against a baseline, score quality, and add the
-          session to your library.
+          Drop CSVs from your Osmograph, ESP32, or any MOX array — or existing{" "}
+          <code className="rounded bg-muted px-1 py-0.5 text-xs">.osmell</code> files. You can
+          add many at once. We detect channels, normalize against a baseline, score quality,
+          and add every session to your library.
         </p>
       </div>
 
@@ -166,7 +178,11 @@ export function ImportView() {
         <div className="flex flex-col items-center justify-center gap-4 rounded-xl border border-border/60 bg-card py-24 text-muted-foreground">
           <Loader2 className="size-8 animate-spin" />
           <p className="text-sm">
-            {status === "uploading" ? "Reading file…" : "Parsing and scoring…"}
+            {status === "uploading"
+              ? "Reading files…"
+              : progress
+                ? `Parsing and scoring ${progress.done} of ${progress.total}…`
+                : "Parsing and scoring…"}
           </p>
         </div>
       )}
@@ -181,22 +197,53 @@ export function ImportView() {
         </div>
       )}
 
-      {status === "ready" && file && report && (
+      {status === "ready" && results.length > 0 && (
         <div className="flex flex-col gap-4">
-          <SessionDetail
-            fileName={filename}
-            file={file}
-            report={report}
-            features={features}
-            onDownload={() => downloadOsmell(file, filename)}
-          />
+          {single ? (
+            <SessionDetail
+              fileName={single.fileName}
+              file={single.file}
+              report={single.report}
+              features={single.features}
+              onDownload={() => downloadOsmell(single.file, single.fileName)}
+            />
+          ) : (
+            <div className="flex flex-col gap-3 rounded-xl border border-border/60 bg-card p-4">
+              <p className="text-sm font-medium">
+                Imported {okResults.length} session{okResults.length === 1 ? "" : "s"}
+                {errResults.length > 0 ? `, ${errResults.length} skipped` : ""}
+              </p>
+              <div className="flex flex-col gap-1.5">
+                {results.map((r) =>
+                  r.status === "ok" ? (
+                    <div key={r.fileName} className="flex items-center gap-2 text-sm">
+                      <CheckCircle2 className="size-4 shrink-0 text-emerald-500" />
+                      <span className="min-w-0 truncate">{r.fileName}</span>
+                      <Badge variant={r.report.badge === "Excellent" ? "default" : "secondary"} className="shrink-0">
+                        {r.report.total ?? "—"}/100 · {r.report.badge}
+                      </Badge>
+                    </div>
+                  ) : (
+                    <div key={r.fileName} className="flex items-center gap-2 text-sm">
+                      <XCircle className="size-4 shrink-0 text-destructive" />
+                      <span className="min-w-0 truncate">{r.fileName}</span>
+                      <span className="shrink-0 truncate text-xs text-destructive">{r.error}</span>
+                    </div>
+                  ),
+                )}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Full per-session detail lives in the Library — filter by quality badge or open the manifest to relabel.
+              </p>
+            </div>
+          )}
           <div className="flex items-center gap-3">
             <CheckCircle2 className="size-4 text-emerald-500" />
             <span className="text-sm text-muted-foreground">
-              Added to your library.
+              {okResults.length} added to your library{errResults.length > 0 ? `, ${errResults.length} skipped` : "."}
             </span>
             <Button variant="outline" size="sm" onClick={reset}>
-              Import another
+              Import more
             </Button>
           </div>
         </div>
@@ -206,6 +253,7 @@ export function ImportView() {
         ref={inputRef}
         type="file"
         accept=".csv,.txt,.osmell"
+        multiple
         className="hidden"
         onChange={(e) => e.target.files && handleFiles(e.target.files)}
       />
@@ -248,11 +296,11 @@ function UploadCard({
       </div>
       <div>
         <p className="text-sm font-medium">
-          Drop your recording here, or <span className="text-primary">browse</span>
+          Drop your recordings here, or <span className="text-primary">browse</span>
         </p>
         <p className="mt-1 text-xs text-muted-foreground">
-          Accepts <code>.csv</code>, <code>.txt</code>, or an existing{" "}
-          <code>.osmell</code> file
+          One file or many at once — <code>.csv</code>, <code>.txt</code>, or{" "}
+          <code>.osmell</code>
         </p>
       </div>
     </div>

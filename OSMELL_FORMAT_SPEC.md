@@ -1,6 +1,6 @@
 # OSMELL Format Specification
 
-**Version:** 1.0.0 · **Status:** Draft for review
+**Version:** 1.1.0 · **Status:** Draft for review
 **Authors:** OpenSmell project
 **Format extension:** `.osmell`
 **MIME type:** `application/vnd.opensmell.osmell` (alias: `application/x-osmell`)
@@ -96,7 +96,7 @@ compatibility).
 ```json
 {
   "osmell": {
-    "formatVersion": "1.0.0",
+    "formatVersion": "1.1.0",
     "specUrl": "https://github.com/opensmell/osmograph-web/blob/main/OSMELL_FORMAT_SPEC.md"
   },
   "sensor": {
@@ -143,7 +143,7 @@ compatibility).
 
 | Field          | Type   | Required | Meaning                                    |
 | -------------- | ------ | -------- | ------------------------------------------ |
-| `formatVersion`| string | yes      | This spec version, e.g. `"1.0.0"`.         |
+| `formatVersion`| string | yes      | This spec version, e.g. `"1.1.0"`.         |
 | `specUrl`      | string | no       | Canonical URL of the spec this file conforms to. |
 
 #### 3.2.2 `sensor` object (required)
@@ -312,6 +312,18 @@ first samples are known clean-air conditions. Files that use auto-R0 MUST
 declare `baseline.source: "auto"` so downstream consumers know the provenance
 of `R0`.
 
+`baseline.source: "auto"` is an **explicit declaration of weaker evidence**,
+not a default that looks like an explicit baseline:
+
+- It records that no separate baseline file exists and that R0 was derived from
+  the exposure file's leading window.
+- Consumers MUST NOT treat an `"auto"` recording as equivalent to an explicit
+  baseline for cross-session comparison; the quality report MUST flag it (see
+  §7.1.4), because the leading window cannot be verified as clean air from the
+  file alone.
+- Writers MUST use `"explicit"` when a baseline file is linked and `"none"`
+  when no R0 exists at all; they MUST NOT leave `source` unset.
+
 ---
 
 ## 6. MOX normalization and features
@@ -366,7 +378,7 @@ recomputed from source. Pre-computed values may be cached in `quality.json` or
 
 ## 7. Data-quality scoring
 
-The quality report (`quality.json`) is a 0–100 score composed of five
+The quality report (`quality.json`) is a 0–100 score composed of seven
 sub-scores, each defined by an explicit, hard-to-vary formula. It is computed
 **from the recording itself** and requires no external truth — the same file
 scored by any conforming implementation yields the same numbers to numerical
@@ -374,7 +386,7 @@ precision.
 
 ### 7.1 Sub-scores
 
-#### 7.1.1 Continuity `C` (weight 0.20)
+#### 7.1.1 Continuity `C` (weight 0.15)
 
 Measures adherence to the nominal sampling schedule using only interior
 inter-sample gaps. Let the time column have `N` values `t[0..N-1]` and nominal
@@ -393,7 +405,7 @@ report MUST note this. `C` is capped at 100. A file with a single sample
 (`N = 1`) scores `C = 100` (no gaps to penalize) but is heavily penalized by
 Duration below.
 
-#### 7.1.2 Dynamic range `D` (weight 0.15)
+#### 7.1.2 Dynamic range `D` (weight 0.10)
 
 Per channel, how much of the usable ADC range the signal actually occupies.
 With full-scale `M = adcMax` (default 4095) and observed channel min/max:
@@ -407,7 +419,7 @@ D      = mean over channels
 Dead channels (cv < 0.001, §6.2) are excluded from the mean and counted toward
 the Dead Sensors flag.
 
-#### 7.1.3 Saturation-free `S` (weight 0.15)
+#### 7.1.3 Saturation-free `S` (weight 0.10)
 
 Fraction of samples **not** clipped at either rail, per channel, averaged:
 
@@ -433,7 +445,10 @@ B = 100 · clamp(1 − cv_window / 0.05, 0, 1)
 
 A window whose coefficient of variation is ≥5% scores zero (too noisy to trust
 R0); a dead-flat window scores 100. When no R0 is available, `B = 0` with
-reason `no_baseline`.
+reason `no_baseline`. When `baseline.source == "auto"`, `B` is capped at 50
+and the reason MUST note `auto_r0` — the leading window's cleanliness is
+declared, not verifiable, so an auto-R0 file can never earn full baseline
+credit.
 
 #### 7.1.5 Signal strength / SNR `G` (weight 0.20)
 
@@ -453,7 +468,31 @@ G        = max over channels (strongest channel is the meaningful signal)
 For `role` other than `exposure`, or when no R0 exists, `G` is reported as `null`
 and excluded from the total (§7.2), with reason `no_exposure_signal`.
 
-#### 7.1.6 Duration adequacy `T` (weight 0.10)
+#### 7.1.6 Recovery completeness `R` (weight 0.15)
+
+Only meaningful for `role: "exposure"` with an R0. A MOX response is only
+comparable across sessions if the recording captured the decay back toward
+baseline — a recovery window. Measure how much of the peak response has relaxed
+by the end of the recording:
+
+```
+peak_k     = max_i |(x[i] − R0) / R0|          (same as G)
+final_win_k = median of normalized in the last 15 samples
+recovered_k = 1 − clamp( |final_win_k| / max(peak_k, 1e-6), 0, 1 )
+R_k        = 100 · recovered_k
+R          = mean over non-dead channels
+```
+
+A recording that ends at full deflection scores 0 (no recovery captured); one
+that returns to within 5% of baseline scores ≈95–100. For `role` other than
+`exposure`, or when no R0 exists, `R` is reported as `null` and excluded from
+the total (§7.2), with reason `no_exposure_signal`.
+
+This sub-score exists because the reference desktop recorder lacks an explicit
+recovery phase — a recorded response whose recovery tail was never captured
+cannot support decay modeling (see the feasibility engine's capture guidance).
+
+#### 7.1.7 Duration adequacy `T` (weight 0.10)
 
 MOX kinetics need enough samples for rise/decay analysis. With `N` samples and
 nominal rate `samplingRateHz`:
@@ -468,12 +507,13 @@ If the rate is undeclared, the median gap is used to estimate `t_seconds`.
 ### 7.2 Total score and badge
 
 ```
-weights = { C: 0.20, D: 0.15, S: 0.15, B: 0.20, G: 0.20, T: 0.10 }
+weights = { C: 0.15, D: 0.10, S: 0.10, B: 0.20, G: 0.20, R: 0.15, T: 0.10 }
 sum_w   = Σ w_i over non-null sub-scores
 score   = round( Σ w_i · sub_i / sum_w )
 ```
 
-`G` is null for non-exposure roles; all other sub-scores are always present.
+`G` and `R` are null for non-exposure roles; all other sub-scores are always
+present.
 
 | Score range | Badge       | Guidance                                    |
 | ----------- | ----------- | ------------------------------------------- |
@@ -493,7 +533,8 @@ score   = round( Σ w_i · sub_i / sum_w )
   "badge": "Good",
   "subscores": {
     "continuity": 92, "dynamicRange": 81, "saturationFree": 100,
-    "baselineStability": 88, "signalStrength": null, "durationAdequacy": 74
+    "baselineStability": 88, "signalStrength": null, "recoveryCompleteness": 85,
+    "durationAdequacy": 74
   },
   "flags": {
     "deadSensors": ["NO2"],

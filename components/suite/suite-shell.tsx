@@ -9,23 +9,27 @@ import {
   Plus,
   Sparkles,
   UploadCloud,
+  Wind,
 } from "lucide-react"
 import { SessionProvider, useSessions } from "@/components/suite/session-context"
 import { LibraryView } from "@/components/suite/library-view"
 import { ImportView } from "@/components/suite/import-view"
 import { CompareView } from "@/components/suite/compare-view"
 import { TrainView } from "@/components/suite/train-view"
+import { SmellabilityView } from "@/components/suite/smellability-view"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import ThemeToggle from "@/components/theme-toggle"
 import { cn } from "@/lib/utils"
 
-type View = "library" | "import" | "compare" | "train"
+type View = "library" | "import" | "compare" | "train" | "smellability"
 
 const NAV: { id: View; label: string; icon: React.ElementType; hint: string }[] = [
   { id: "library", label: "Library", icon: Library, hint: "All sessions, grouped by experiment" },
   { id: "import", label: "Import", icon: UploadCloud, hint: "CSV / .osmell in, scored sessions out" },
   { id: "compare", label: "Compare", icon: GitCompareArrows, hint: "Overlay normalized responses" },
   { id: "train", label: "Train", icon: FlaskConical, hint: "Classifiers on labeled sessions" },
+  { id: "smellability", label: "Smellability", icon: Wind, hint: "Is it detectable on your array?" },
 ]
 
 function Shell() {
@@ -49,6 +53,7 @@ function Shell() {
             <FolderOpen className="size-3.5" />
             {sessions.length} session{sessions.length === 1 ? "" : "s"}
           </div>
+          <ThemeToggle />
         </div>
       </header>
 
@@ -110,6 +115,7 @@ function Shell() {
           {view === "import" && <ImportView />}
           {view === "compare" && <CompareView />}
           {view === "train" && <TrainView />}
+          {view === "smellability" && <SmellabilityView sessions={sessions} />}
         </main>
       </div>
     </div>
