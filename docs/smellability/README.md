@@ -27,7 +27,7 @@ evaluation: the honesty rules are evidence-driven.
 | [`feasibility-chain.md`](feasibility-chain.md) | The 4-step physics chain: identity → volatility → headspace → MOX reactivity → array capacity. All equations, thresholds, and confidence semantics. |
 | [`substance-profiles.md`](substance-profiles.md) | How everyday things (banana, cinnamon) become weighted composite mixtures; worked examples with full numbers; human-vs-MOX sensitivity asymmetry. |
 | [`calibration-lessons.md`](calibration-lessons.md) | The measured lab evidence and how each finding became a constraint on what a web verdict may claim. |
-| [`../../OSMELL_FORMAT_SPEC.md`](../../OSMELL_FORMAT_SPEC.md) | The `.osmell` v1.1.0 container spec (ZIP + CSV + JSON), quality taxonomy, and manifest conventions. |
+| [`OPENSMELL_MASTER.md` §3](../../../opensmell/docs/OPENSMELL_MASTER.md) | The `.osmell` v1.1.0 container spec (ZIP + CSV + JSON), quality taxonomy, and manifest conventions. |
 
 Start with `feasibility-chain.md` if you want the math, or
 `calibration-lessons.md` if you want to know *why the design is shaped the way
@@ -87,9 +87,9 @@ outside `osmograph-web/`, referenced from `calibration-lessons.md`:
 |---|---|
 | Affine calibration failed 47% → 33% on real cross-device data; session-invariance proof (81.78% acc / 80.33% macro-F1) | `../../../OpenSmell-Legacy/TECHNICAL.md` |
 | The calibration experiment artifacts themselves | `../../../research/calibration-experiments/` |
-| Sensor theory: effective dimensionality, drift, batch ±20%, humidity common-mode | `../../../opensmell/docs/SENSOR_THEORY.md` |
+| Sensor theory: effective dimensionality, drift, batch ±20%, humidity common-mode | `../../../opensmell/docs/OPENSMELL_MASTER.md` §6 |
 | Canonical array-capacity Table 2 and MOX-boundary Table 3 | `../../../interoperability/canonical_experiments/generate_tables.py` |
-| Audit of the negative results | `../../../AUDIT_REPORT.md` |
+| Audit of the negative results | `../../../opensmell/docs/OPENSMELL_MASTER.md` §8 |
 
 ---
 

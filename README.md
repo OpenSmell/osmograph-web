@@ -18,11 +18,12 @@ data quality, and export the `.osmell` format.
 
 ## The OSMELL format
 
-`OSMELL_FORMAT_SPEC.md` is the single source of truth for the `.osmell` file
-format: sensor-agnostic container, explicit baseline/target session protocol,
-session-invariant normalization, and hard-to-vary quality scoring. It is
-designed to be the successor to Osmograph's legacy CSV convention and to back
-future paper revisions and official documentation.
+The `.osmell` format spec v1.1.0 is consolidated in
+`../opensmell/docs/OPENSMELL_MASTER.md` §3: sensor-agnostic container,
+explicit baseline/target session protocol, session-invariant normalization, and
+hard-to-vary quality scoring. It is designed to be the successor to Osmograph's
+legacy CSV convention and to back future paper revisions and official
+documentation.
 
 ## Stack
 

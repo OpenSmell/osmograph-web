@@ -23,13 +23,13 @@
 
 ## 4. Effective dimensionality is far below sensor count
 
-- Real MOX sensors covary: two same-family MOX sensors have effective dimensionality ~1; three MOX sensors ~1.5–2; four ~2–3 (`opensmell/docs/SENSOR_THEORY.md`). Humidity is a common-mode signal across SnO₂ channels.
+- Real MOX sensors covary: two same-family MOX sensors have effective dimensionality ~1; three MOX sensors ~1.5–2; four ~2–3 (`opensmell/docs/OPENSMELL_MASTER.md` §6). Humidity is a common-mode signal across SnO₂ channels.
 - This is why the canonical Table 2 (3 → 4–6, 6 → 20–40, 12 → 200–400, 24 → 10,000+ distinguishable substances) is conservative and why `MAX_SUBSTANCES` in `lib/smellability/constants.ts` uses the top of each range with 4/5 interpolated.
 - **Web consequence:** the verdict does not promise that N sensors distinguish everything — it grades a single substance and flags *label overlap* with the user's existing library. Distinguishing chemically similar compounds (isomers such as limonene vs pinene) is explicitly out of scope for small arrays.
 
 ## 5. Drift, batch variance, and humidity set the capture rules
 
-- Sensor drift can break decision boundaries within days without recalibration; batch-to-batch sensitivity varies ±20% for the same part number (`opensmell/docs/SENSOR_THEORY.md`).
+- Sensor drift can break decision boundaries within days without recalibration; batch-to-batch sensitivity varies ±20% for the same part number (`opensmell/docs/OPENSMELL_MASTER.md` §6).
 - **Web consequence:** the chain's `guidance()` always prescribes the capture protocol (clean-air baseline → exposure → recovery) and the verdict's guidance text varies with the expected signal (short exposures for strong/fast, maximized headspace + long windows for weak/slow). The `crossCheck` and guidance text together tell the user *how* to record so the labels stay usable across sessions — the closest thing the web layer can do to "calibration" without hardware assumptions.
 
 ## 6. Normalization & preprocessing findings
@@ -55,6 +55,6 @@ The engine never fabricates missing data and never upgrades an estimate to a mea
 - `../../../OpenSmell-Legacy/TECHNICAL.md` — affine failure (47%→33%), session-invariance proof, learned-latent rationale
 - `../../../research/calibration-experiments/` — affine vs real-data failure, z-score vs Rs/R₀, paradigm features
 - `../../../Chemoprint/README.md` §6 — convex-hull / pure-anchor coverage limit
-- `../../../opensmell/docs/SENSOR_THEORY.md` — effective dimensionality, drift, batch variance, humidity common-mode
+- `../../../opensmell/docs/OPENSMELL_MASTER.md` §6 — effective dimensionality, drift, batch variance, humidity common-mode
 - `../../../interoperability/canonical_experiments/generate_tables.py` — Table 2 capacity ranges, Table 3 MOX boundaries
-- `../../../AUDIT_REPORT.md` — audit of these negative results (affine-calibration-failed confirmed)
+- `../../../opensmell/docs/OPENSMELL_MASTER.md` §8 — audit of these negative results (affine-calibration-failed confirmed)
