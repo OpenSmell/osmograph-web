@@ -115,6 +115,7 @@ export type QualityReasonCode =
   | "low_span"
   | "clipping"
   | "too_short"
+  | "auto_r0"
   | "ok"
 
 export interface SubScore {
@@ -134,6 +135,7 @@ export interface QualityReport {
     saturationFree: SubScore
     baselineStability: SubScore
     signalStrength: SubScore
+    recoveryCompleteness: SubScore
     durationAdequacy: SubScore
   }
   flags: QualityFlags

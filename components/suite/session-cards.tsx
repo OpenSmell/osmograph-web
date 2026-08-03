@@ -81,11 +81,12 @@ export function StatCard({
 
 export function QualityCard({ report }: { report: QualityReport }) {
   const subs = [
-    { key: "continuity", label: "Continuity", weight: "20%" },
-    { key: "dynamicRange", label: "Dynamic range", weight: "15%" },
-    { key: "saturationFree", label: "Saturation-free", weight: "15%" },
+    { key: "continuity", label: "Continuity", weight: "15%" },
+    { key: "dynamicRange", label: "Dynamic range", weight: "10%" },
+    { key: "saturationFree", label: "Saturation-free", weight: "10%" },
     { key: "baselineStability", label: "Baseline stability", weight: "20%" },
     { key: "signalStrength", label: "Signal strength", weight: "20%" },
+    { key: "recoveryCompleteness", label: "Recovery", weight: "15%" },
     { key: "durationAdequacy", label: "Duration", weight: "10%" },
   ] as const
 
