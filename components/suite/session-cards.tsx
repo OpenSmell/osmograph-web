@@ -14,6 +14,7 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { FingerprintCard } from "@/components/suite/fingerprint-card"
 import type { OsmellFile, QualityReport, MoxFeatures } from "@/lib/osmell"
 
 export const ROLE_LABELS: Record<string, string> = {
@@ -256,6 +257,8 @@ export function SessionDetail({
         <QualityCard report={report} />
         {features && features.length > 0 ? <ChannelCard features={features} report={report} /> : null}
       </div>
+
+      {features && features.length > 0 ? <FingerprintCard features={features} /> : null}
 
       <SessionNotes report={report} />
     </div>

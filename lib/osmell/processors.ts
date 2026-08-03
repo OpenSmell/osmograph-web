@@ -3,7 +3,8 @@ import type {
   OsmellFile,
   SensorType,
 } from "./types"
-import { baselineForChannel, channelStats, normalizedSeries } from "./normalize"
+import { DEFAULT_R0_SAMPLES } from "./types"
+import { baselineForChannel, channelStats, normalizedSeries, std } from "./normalize"
 import { parseCsv } from "./csv"
 
 export interface MoxFeatures {
@@ -15,6 +16,8 @@ export interface MoxFeatures {
   auc: number
   r0: number
   dead: boolean
+  endpointDelta: number
+  saturationIndex: number
 }
 
 export interface MoxProcessorResult {
@@ -36,6 +39,7 @@ function firstCrossTime(
 
 export function processMox(file: OsmellFile): MoxProcessorResult {
   const channels = file.manifest.sensor.channels
+  const r0Samples = file.manifest.baseline?.r0Samples ?? DEFAULT_R0_SAMPLES
   const features: MoxFeatures[] = []
   const normalized: Record<string, number[]> = {}
 
@@ -50,7 +54,9 @@ export function processMox(file: OsmellFile): MoxProcessorResult {
     let direction: 1 | -1 = 1
     let auc = 0
     let riseTimeMs: number | null = null
-    const decayTimeMs: number | null = null
+    let decayTimeMs: number | null = null
+    let endpointDelta = 0
+    let saturationIndex = 0
 
     if (!stats.dead && finiteNorm.length > 0) {
       const maxVal = Math.max(...finiteNorm)
@@ -72,6 +78,11 @@ export function processMox(file: OsmellFile): MoxProcessorResult {
         if (dt > 0) auc += (norm[i] + prev) * dt * 0.5
         prev = norm[i]
       }
+
+      const peakIdx = argmaxAbs(norm)
+      decayTimeMs = decayTimeMsAfter(norm, file.time, peakIdx)
+      endpointDelta = norm[norm.length - 1] ?? 0
+      saturationIndex = saturationIndexFor(norm, r0Samples)
     }
 
     normalized[ch.id] = norm
@@ -84,10 +95,57 @@ export function processMox(file: OsmellFile): MoxProcessorResult {
       auc,
       r0,
       dead: stats.dead,
+      endpointDelta,
+      saturationIndex,
     })
   }
 
   return { sensorType: "mox", features, normalized }
+}
+
+function argmaxAbs(values: number[]): number {
+  let best = 0
+  for (let i = 1; i < values.length; i++) {
+    if (Math.abs(values[i]) > Math.abs(values[best])) best = i
+  }
+  return best
+}
+
+function decayTimeMsAfter(
+  norm: number[],
+  time: number[],
+  peakIdx: number,
+): number | null {
+  if (norm.length - peakIdx <= 2) return null
+  const pk = norm[peakIdx]
+  if (!Number.isFinite(pk) || pk === 0) return null
+  const t90 = 0.9 * pk
+  const t10 = 0.1 * pk
+  const nearPeak = (v: number) => (pk >= 0 ? v >= t90 : v <= t90)
+  const nearBaseline = (v: number) => (pk >= 0 ? v <= t10 : v >= t10)
+  let si = -1
+  for (let i = peakIdx; i < norm.length; i++) {
+    if (nearPeak(norm[i])) {
+      si = i
+      break
+    }
+  }
+  if (si < 0) return null
+  for (let i = si; i < norm.length; i++) {
+    if (nearBaseline(norm[i])) {
+      return time[i] - time[peakIdx]
+    }
+  }
+  return null
+}
+
+function saturationIndexFor(norm: number[], r0Samples: number): number {
+  if (norm.length < r0Samples + 5) return 0
+  const r0Norm = norm.slice(0, r0Samples)
+  const currentResponse = Math.max(...norm.map((v) => Math.abs(v)))
+  const noiseFloor = std(r0Norm)
+  if (!Number.isFinite(noiseFloor) || currentResponse < noiseFloor * 2) return 0
+  return Math.min(1, currentResponse / (currentResponse + noiseFloor * 10))
 }
 
 export interface ProcessorResult {

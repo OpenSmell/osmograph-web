@@ -77,6 +77,15 @@ function scanSmiles(smiles: string): ScanResult {
       i++
       continue
     }
+    if (ch === ".") {
+      // Disconnected fragment (e.g. `[S-].[K+]` salts): no bond is formed
+      // with the previous atom, so the "last" pointer must reset.
+      last = -1
+      pendingBond = 1
+      pendingDpos = undefined
+      i++
+      continue
+    }
     if (ch === "%") {
       const d = parseInt(smiles.slice(i + 1, i + 3), 10)
       if (last >= 0) {
@@ -134,13 +143,17 @@ function scanSmiles(smiles: string): ScanResult {
   }
 
   // Ring closures: an atom written `C1` and a later `C1` (or `=C1`) close the
-  // same ring. Pair them up; the closure bond is single in Kekulé notation.
+  // same ring. The closure bond is single in Kekulé notation. A digit may be
+  // reused for a later ring (e.g. dibenzofuran `c1ccc2c(c1)oc1ccccc12`), so
+  // occurrences pair up sequentially: 1st-2nd, 3rd-4th, and so on.
   const ringPairs: [number, number][] = []
-  for (const [d, occ] of digitToAtoms) {
-    if (occ.length !== 2) continue
-    const [x, y] = occ
-    ringPairs.push([x, y])
-    pushEdge(x, y, 1)
+  for (const [, occ] of digitToAtoms) {
+    for (let k = 1; k < occ.length; k += 2) {
+      const x = occ[k - 1]
+      const y = occ[k]
+      ringPairs.push([x, y])
+      pushEdge(x, y, 1)
+    }
   }
 
   return { atoms, ringPairs }

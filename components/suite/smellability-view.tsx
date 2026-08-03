@@ -460,7 +460,13 @@ function LiveResultCard({
   )
 }
 
-export function SmellabilityView({ sessions }: { sessions: SuiteSession[] }) {
+export function SmellabilityView({
+  sessions,
+  prefill,
+}: {
+  sessions: SuiteSession[]
+  prefill?: string | null
+}) {
   const [query, setQuery] = React.useState("")
   const [candidates, setCandidates] = React.useState<SearchCandidate[]>([])
   const [showSuggestions, setShowSuggestions] = React.useState(false)
@@ -481,6 +487,29 @@ export function SmellabilityView({ sessions }: { sessions: SuiteSession[] }) {
   const [liveBp, setLiveBp] = React.useState<EnrichedBoilingPoint | null>(null)
   const [liveResolveFailed, setLiveResolveFailed] = React.useState(false)
   const [liveSaved, setLiveSaved] = React.useState(false)
+
+  const handledPrefill = React.useRef<string | null>(null)
+
+  React.useEffect(() => {
+    if (!prefill) {
+      handledPrefill.current = null
+      return
+    }
+    if (handledPrefill.current === prefill) return
+    handledPrefill.current = prefill
+    void (async () => {
+      setQuery(prefill)
+      const results = searchSubstances(prefill, 1)
+      if (results.length > 0) {
+        pick(results[0])
+      } else {
+        setSelected(null)
+        setCandidates([])
+        setShowSuggestions(false)
+        void resolveLive(prefill)
+      }
+    })()
+  }, [prefill])
 
   const [bench, setBench] = React.useState<FeasibilityVerdict[]>([])
   const [benchLoaded, setBenchLoaded] = React.useState(false)

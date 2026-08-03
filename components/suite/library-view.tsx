@@ -8,6 +8,7 @@ import {
   Plus,
   ShieldCheck,
   Trash2,
+  Wind,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -18,8 +19,15 @@ import {
   downloadOsmell,
 } from "@/components/suite/session-cards"
 import { useSessions, type SuiteSession } from "@/components/suite/session-context"
+import { DESKTOP_APP_URL } from "@/lib/constants"
 
-export function LibraryView({ onImport }: { onImport: () => void }) {
+export function LibraryView({
+  onImport,
+  onVerdict,
+}: {
+  onImport: () => void
+  onVerdict: (label: string) => void
+}) {
   const { sessions, removeSession, clearSessions, selectedIds, toggleSelected, clearSelected } = useSessions()
   const [openId, setOpenId] = React.useState<string | null>(null)
 
@@ -32,12 +40,20 @@ export function LibraryView({ onImport }: { onImport: () => void }) {
         <div className="flex flex-col gap-1">
           <p className="text-sm font-medium">Your library is empty</p>
           <p className="text-xs text-muted-foreground">
-            Import a recording to start building your session library.
+            Record with the desktop app, then import a recording to start building
+            your session library.
           </p>
         </div>
-        <Button size="sm" onClick={onImport}>
-          <Plus className="size-4" /> Import a recording
-        </Button>
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          <Button size="sm" onClick={onImport}>
+            <Plus className="size-4" /> Import a recording
+          </Button>
+          <Button asChild size="sm" variant="outline">
+            <a href={DESKTOP_APP_URL} target="_blank" rel="noreferrer">
+              <Download className="size-4" /> Get the desktop app
+            </a>
+          </Button>
+        </div>
       </div>
     )
   }
@@ -90,6 +106,10 @@ export function LibraryView({ onImport }: { onImport: () => void }) {
                 onToggle={() => setOpenId(openId === s.id ? null : s.id)}
                 onSelect={() => toggleSelected(s.id)}
                 onRemove={() => removeSession(s.id)}
+                onVerdict={() => {
+                  const label = s.file.manifest.session.label
+                  if (label) onVerdict(label)
+                }}
               />
             ))}
             <div className="flex gap-2 text-xs text-muted-foreground">
@@ -121,6 +141,7 @@ function SessionRow({
   onToggle,
   onSelect,
   onRemove,
+  onVerdict,
 }: {
   session: SuiteSession
   open: boolean
@@ -128,10 +149,12 @@ function SessionRow({
   onToggle: () => void
   onSelect: () => void
   onRemove: () => void
+  onVerdict: () => void
 }) {
   const { file, report, features } = session
   const role = file.manifest.session.role
   const label = file.manifest.session.label || "Untitled recording"
+  const rawLabel = file.manifest.session.label
 
   return (
     <div className="overflow-hidden rounded-xl border border-border/60 bg-card">
@@ -170,6 +193,17 @@ function SessionRow({
           <Badge variant={report.badge === "Excellent" ? "default" : "secondary"}>
             <ShieldCheck className="size-3" /> {report.total ?? "—"}
           </Badge>
+          {rawLabel && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-7"
+              title={`Run smellability verdict for "${rawLabel}"`}
+              onClick={onVerdict}
+            >
+              <Wind className="size-3.5" />
+            </Button>
+          )}
           <Button
             variant="ghost"
             size="icon"

@@ -2,10 +2,12 @@
 
 import * as React from "react"
 import {
+  Download,
   FlaskConical,
   FolderOpen,
   GitCompareArrows,
   Library,
+  MonitorDown,
   Plus,
   Sparkles,
   UploadCloud,
@@ -21,6 +23,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import ThemeToggle from "@/components/theme-toggle"
 import { cn } from "@/lib/utils"
+import { DESKTOP_APP_URL } from "@/lib/constants"
 
 type View = "library" | "import" | "compare" | "train" | "smellability"
 
@@ -34,7 +37,13 @@ const NAV: { id: View; label: string; icon: React.ElementType; hint: string }[] 
 
 function Shell() {
   const [view, setView] = React.useState<View>("library")
+  const [verdictPrefill, setVerdictPrefill] = React.useState<string | null>(null)
   const { sessions } = useSessions()
+
+  const navigate = (next: View) => {
+    setVerdictPrefill(null)
+    setView(next)
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -53,7 +62,14 @@ function Shell() {
             <FolderOpen className="size-3.5" />
             {sessions.length} session{sessions.length === 1 ? "" : "s"}
           </div>
-          <ThemeToggle />
+          <div className="flex items-center gap-2">
+            <Button asChild size="sm" className="gap-1.5">
+              <a href={DESKTOP_APP_URL} target="_blank" rel="noreferrer">
+                <Download className="size-3.5" /> Desktop app
+              </a>
+            </Button>
+            <ThemeToggle />
+          </div>
         </div>
       </header>
 
@@ -64,7 +80,7 @@ function Shell() {
             return (
               <button
                 key={item.id}
-                onClick={() => setView(item.id)}
+                onClick={() => navigate(item.id)}
                 className={cn(
                   "flex flex-col gap-0.5 rounded-lg border border-transparent px-3 py-2.5 text-left transition-colors",
                   view === item.id
@@ -79,11 +95,16 @@ function Shell() {
               </button>
             )
           })}
-          <div className="mt-auto border-t border-border/60 pt-4">
+          <div className="mt-auto flex flex-col gap-2 border-t border-border/60 pt-4">
+            <Button asChild variant="ghost" size="sm" className="w-full justify-start">
+              <a href={DESKTOP_APP_URL} target="_blank" rel="noreferrer">
+                <MonitorDown className="size-4" /> Get the desktop app
+              </a>
+            </Button>
             <Button
               size="sm"
               className="w-full"
-              onClick={() => setView("import")}
+              onClick={() => navigate("import")}
             >
               <Plus className="size-4" /> New import
             </Button>
@@ -97,7 +118,7 @@ function Shell() {
             return (
               <button
                 key={item.id}
-                onClick={() => setView(item.id)}
+                onClick={() => navigate(item.id)}
                 className={cn(
                   "flex flex-1 flex-col items-center gap-1 py-2.5 text-[11px]",
                   view === item.id ? "text-primary" : "text-muted-foreground",
@@ -111,11 +132,19 @@ function Shell() {
         </div>
 
         <main className="min-w-0 flex-1 px-6 py-8 pb-24 md:pb-8">
-          {view === "library" && <LibraryView onImport={() => setView("import")} />}
+          {view === "library" && (
+            <LibraryView
+              onImport={() => navigate("import")}
+              onVerdict={(label) => {
+                setVerdictPrefill(label)
+                setView("smellability")
+              }}
+            />
+          )}
           {view === "import" && <ImportView />}
           {view === "compare" && <CompareView />}
           {view === "train" && <TrainView />}
-          {view === "smellability" && <SmellabilityView sessions={sessions} />}
+          {view === "smellability" && <SmellabilityView sessions={sessions} prefill={verdictPrefill} />}
         </main>
       </div>
     </div>
