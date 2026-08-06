@@ -24,6 +24,15 @@ export interface DeviceDescriptor {
   firmware?: string
 }
 
+export interface CalibrationDescriptor {
+  a: number
+  b: number
+  referenceSubstance?: string
+  referencePpm?: number
+  date?: string
+  method?: string
+}
+
 export interface SensorDescriptor {
   sensorType: SensorType
   device?: DeviceDescriptor
@@ -32,6 +41,7 @@ export interface SensorDescriptor {
   adcBits?: number
   adcMax?: number
   timeColumn: TimeColumn
+  calibration?: Record<string, CalibrationDescriptor>
 }
 
 export interface SessionDescriptor {

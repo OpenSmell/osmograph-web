@@ -104,4 +104,4 @@ The engine's per-sensor-count constant (`MAX_SUBSTANCES` in `lib/smellability/co
 - Trouton's rule: Trouton (1884) *Phil. Mag.* 18, 54–57.
 - MOX sensor operating principle: Korotcenkov (2007), *Metal oxides for solid-state gas sensors*, Mater. Sci. Eng. B 139, 1–23.
 - Sensor ranges: Figaro / Hanwei MQ-series datasheets.
-- Cross-device baseline evidence: `../../../research/calibration-experiments` and `../../../opensmell/docs/OPENSMELL_MASTER.md` §8.
+- Cross-device baseline evidence: `../../../research/calibration-experiments` and `../../../private/OPENSMELL_MASTER.md` §8.
