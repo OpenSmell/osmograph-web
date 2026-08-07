@@ -236,6 +236,9 @@ export function runConstituentChain(c: Chemical): ConstituentVerdict {
   if (c.props.nonRedox) {
     reactVerdict = "red"
     reactReason = `${c.name} is not redox-active at MOX operating temperatures — it will not produce the surface reduction MOX sensors detect.`
+  } else if (c.props.oxidizing) {
+    reactVerdict = "green"
+    reactReason = `${c.name} is an oxidizing gas — at the ~350 °C surface it oxidizes the sensing layer, producing the resistance rise a MOX array reads as a response (opposite sign to reducing VOCs).`
   } else if (c.props.redoxActive) {
     reactVerdict = "green"
     reactReason = `Contains ${groups}; these are oxidized at the ~350 °C sensor surface, producing the resistance change MOX arrays detect.`

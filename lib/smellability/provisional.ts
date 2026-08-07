@@ -19,8 +19,11 @@ export function buildProvisionalChemical(
   const name = enriched.name.trim().toLowerCase()
   const inorganic = /^(n2|o2|co2|ar|he|ne)$/.test(name) || /^(n|o2?|co2|argon|helium|neon|nitrogen|oxygen|carbon dioxide)$/.test(name)
   // Reducing gases (H2, CO, H2S, NH3) and organic molecules are redox-active at
-  // MOX operating temperature; true inerts (N2, O2, CO2, noble gases) are not.
+  // MOX operating temperature; oxidizing gases (O3, Cl2, NO2) respond too — in
+  // the opposite direction (resistance rises). True inerts (N2, O2, CO2, noble
+  // gases) are not.
   const redoxActive = functionalGroups.length > 0 || /^(h2|co|h2s|nh3|hydrogen|hydrogen sulfide|carbon monoxide|ammonia)$/.test(name)
+  const oxidizing = /^(o3|cl2|no2|no|chlorine|ozone|nitrogen dioxide|nitrogen monoxide|nitric oxide)$/.test(name)
 
   return {
     id,
@@ -40,6 +43,7 @@ export function buildProvisionalChemical(
       functionalGroups,
       redoxActive,
       nonRedox: inorganic ? true : undefined,
+      oxidizing: oxidizing ? true : undefined,
       odorDescriptor: undefined,
     },
     sourceRefs: enriched.source === "pubchem" ? ["PubChem (live lookup)"] : [],

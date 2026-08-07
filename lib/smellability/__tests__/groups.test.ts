@@ -40,12 +40,13 @@ describe("Kekulé aromatic-ring detection (PubChem returns C1=CC=CC=C1, not c1cc
     expect(same(groups("C=CCC1=CC(=C(C=C1)O)OC"), ["aromatic", "phenol", "ether", "alkene"])).toBe(true)
   })
 
-  it("furfural reads as furan (five-membered O ring)", () => {
-    expect(same(groups("O=CC1=COC=C1"), ["aromatic", "aldehyde", "furan"])).toBe(false)
+  it("furfural reads as furan (five-membered O ring), no spurious ring alkene", () => {
+    expect(same(groups("O=CC1=COC=C1"), ["aromatic", "aldehyde", "furan"])).toBe(true)
     const g = inferFunctionalGroups("O=CC1=COC=C1")
     expect(g).toContain("furan")
     expect(g).toContain("aromatic")
     expect(g).toContain("aldehyde")
+    expect(g).not.toContain("alkene")
   })
 
   it("styrene keeps its vinyl alkene", () => {
@@ -114,5 +115,77 @@ describe("core functional groups (unchanged behaviour)", () => {
   it("empty or missing SMILES stays silent", () => {
     expect(inferFunctionalGroups(undefined)).toEqual([])
     expect(inferFunctionalGroups("")).toEqual([])
+  })
+})
+
+describe("structural carbonyl / alcohol / ether inference (PubChem forms)", () => {
+  it("branched, ring, and slash-marked ketones", () => {
+    expect(groups("CC(C(=O)C)O")).toContain("ketone") // acetoin
+    expect(groups("CC1=CCC(CC1=O)C(=C)C")).toContain("ketone") // cyclohexenone ring C1=O
+    expect(groups("CC1(C2CCC1(C(=O)C2)C)C")).toContain("ketone") // camphor
+  })
+
+  it("aldehydes written with slash marks (citral)", () => {
+    const g = groups("CC(=CCC/C(=C/C=O)/C)C")
+    expect(g).toContain("aldehyde")
+    expect(g).toContain("alkene")
+  })
+
+  it("slash-marked terpene alcohols (geraniol / nerol / patchouli alcohol)", () => {
+    expect(groups("CC(=CCC/C(=C/CO)/C)C")).toContain("alcohol")
+    expect(groups("CC(=CCC/C(=C\\CO)/C)C")).toContain("alcohol")
+    expect(groups("C[C@H]1CCC[C@@]2([C@@]1(CCCC2)O)C")).toContain("alcohol")
+  })
+
+  it("benzyl / 2-phenylethanol keep alcohol despite the aromatic ring", () => {
+    expect(groups("C1=CC=C(C=C1)CO")).toContain("alcohol")
+    expect(groups("C1=CC=C(C=C1)CCO")).toContain("alcohol")
+  })
+
+  it("ring ether (eucalyptol's oxabicyclo O)", () => {
+    expect(groups("CC1(C2CCC(O1)(CC2)C)C")).toContain("ether")
+  })
+
+  it("lactones read as ester, not ketone or acid", () => {
+    expect(groups("CCCCCC1CCCC(=O)O1")).toContain("ester") // δ-decalactone
+    expect(groups("C1=CC=C2C(=C1)C=CC(=O)O2")).toContain("ester") // coumarin
+    expect(groups("C1=CC=C2C(=C1)C=CC(=O)O2")).not.toContain("ketone")
+    expect(groups("C1=CC=C2C(=C1)C=CC(=O)O2")).not.toContain("carboxylic acid")
+  })
+
+  it("cyclic esters are still esters, straight-chain esters are not acids", () => {
+    expect(groups("CCC(=O)OCC")).toContain("ester")
+    expect(groups("CC(=O)OCC1=CC=CC=C1")).toContain("ester") // benzyl acetate
+    expect(groups("CCC(=O)OCC")).not.toContain("carboxylic acid")
+  })
+
+  it("tertiary amines (trimethylamine) are amines", () => {
+    expect(groups("CN(C)C")).toContain("amine")
+  })
+
+  it("terminal-sulfur thiols (ethanethiol, butanethiol, t-butyl mercaptan)", () => {
+    expect(groups("CCS")).toContain("thiol")
+    expect(groups("CCCCS")).toContain("thiol")
+    expect(groups("CC(C)(C)S")).toContain("thiol")
+  })
+
+  it("sulfur dioxide is sulfur", () => {
+    expect(groups("O=S=O")).toContain("sulfur")
+  })
+
+  it("azines (pyridine / pyrazine) are aromatic amines, not alkenes", () => {
+    expect(groups("C1=CC=NC=C1")).toContain("aromatic")
+    expect(groups("C1=CC=NC=C1")).toContain("amine")
+    expect(groups("C1=CC=NC=C1")).not.toContain("alkene")
+    expect(groups("CC1=CN=C(C(=N1)C)C")).toContain("aromatic")
+    expect(groups("CC1=CN=C(C(=N1)C)C")).toContain("amine")
+  })
+
+  it("fused aromatics: naphthalene and indole get no spurious alkene", () => {
+    expect(groups("C1=CC=C2C=CC=CC2=C1")).toContain("aromatic")
+    expect(groups("C1=CC=C2C=CC=CC2=C1")).not.toContain("alkene")
+    expect(groups("C1=CC=C2C(=C1)C=CN2")).toContain("aromatic")
+    expect(groups("C1=CC=C2C(=C1)C=CN2")).toContain("amine")
+    expect(groups("C1=CC=C2C(=C1)C=CN2")).not.toContain("alkene")
   })
 })

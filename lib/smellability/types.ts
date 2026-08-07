@@ -20,6 +20,7 @@ export interface ChemicalProperties {
   functionalGroups: string[]
   redoxActive: boolean
   nonRedox?: boolean
+  oxidizing?: boolean
   gas?: boolean
   odorDescriptor?: string
 }
@@ -30,6 +31,8 @@ export interface Chemical {
   synonyms: string[]
   cas?: string
   smiles?: string
+  /** PubChem CID this record is sourced from (set for generated/curated records). */
+  pubchemCid?: number
   props: ChemicalProperties
   sourceRefs: string[]
 }

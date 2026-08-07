@@ -1,10 +1,15 @@
 import type { Chemical } from "./types"
+import { GENERATED_COMPOUNDS } from "./compounds-generated"
 
 const m = (value: number): { value: number; source: "measured" } => ({ value, source: "measured" })
 const e = (value: number): { value: number; source: "estimated" } => ({ value, source: "estimated" })
 const u = (): { value: null; source: "unknown" } => ({ value: null, source: "unknown" })
 
-export const COMPOUNDS: Chemical[] = [
+// The CID-generated set (scripts/cids.json → scripts/generate-compounds.ts) is
+// merged below. A curated record with the same PubChem CID wins the slot: it
+// carries measured NIST physics (Antoine coeffs, vapor pressures) and richer
+// aliases, so a generated estimate never overwrites a measured value.
+const CURATED_COMPOUNDS: Chemical[] = [
   {
     id: "ethanol",
     name: "Ethanol",
@@ -796,6 +801,13 @@ export const COMPOUNDS: Chemical[] = [
   },
 ]
 
+const curatedCids = new Set<number>()
+for (const c of CURATED_COMPOUNDS) {
+  if (c.pubchemCid != null) curatedCids.add(c.pubchemCid)
+}
+const GENERATED = GENERATED_COMPOUNDS.filter((c) => c.pubchemCid == null || !curatedCids.has(c.pubchemCid))
+
+export const COMPOUNDS: Chemical[] = [...CURATED_COMPOUNDS, ...GENERATED]
 export const COMPOUND_BY_ID: Map<string, Chemical> = new Map(COMPOUNDS.map((c) => [c.id, c]))
 export const REFERENCE_COMPOUND = COMPOUND_BY_ID.get("ethanol")
 
