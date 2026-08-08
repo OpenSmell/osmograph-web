@@ -19,6 +19,7 @@ import {
 import { COMPOUND_BY_ID, REFERENCE_COMPOUND } from "./compounds"
 import { COMPOSITE_BY_ID } from "./composites"
 import { userDictionaryById } from "./user-dictionary"
+import { resolveStructure } from "./smiles"
 import type {
   ChainStep,
   Chemical,
@@ -143,11 +144,15 @@ export function runConstituentChain(c: Chemical): ConstituentVerdict {
   const mw = c.props.molecularWeight.value
   const bp = c.props.boilingPoint.value
   const odour = c.props.odorDescriptor ? ` Odour: ${c.props.odorDescriptor}.` : ""
+  const resolvedFrom =
+    c.provenance === "structure"
+      ? "parsed atom-by-atom from the SMILES structure you entered."
+      : "resolved from the compound dictionary."
   steps.push({
     id: "identity",
     label: "Identity & properties",
     verdict: "green",
-    reason: `${c.name} resolved from the compound dictionary.`,
+    reason: `${c.name} ${resolvedFrom}`,
     detail: `${c.name}${c.cas ? ` (CAS ${c.cas})` : ""}. Molecular weight ${mw != null ? `${mw.toFixed(1)} g/mol` : "unknown"}, boiling point ${bp != null ? `${bp.toFixed(1)} °C` : "unknown"}.${odour}`,
     values: [
       { label: "Molecular weight", value: mw != null ? `${mw.toFixed(1)} g/mol` : "unknown", source: c.props.molecularWeight.source },
@@ -494,7 +499,7 @@ export function runClassVerdict(classKey: string, opts: ChainOptions = {}): Feas
 
 export function resolveAndRun(entityId: string, kind: "chemical" | "composite" | "class", opts: ChainOptions = {}): FeasibilityVerdict | null {
   if (kind === "chemical") {
-    const c = COMPOUND_BY_ID.get(entityId) ?? userDictionaryById().get(entityId)
+    const c = COMPOUND_BY_ID.get(entityId) ?? userDictionaryById().get(entityId) ?? resolveStructure(entityId)
     return c ? runChemicalVerdict(c, opts) : null
   }
   if (kind === "composite") {

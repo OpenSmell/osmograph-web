@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Static assets served verbatim (incl. the RDKit WASM wrapper copied by
+    // postinstall into public/rdkit — minified third-party JS).
+    "public/**",
   ]),
 ]);
 

@@ -33,6 +33,8 @@ export interface Chemical {
   smiles?: string
   /** PubChem CID this record is sourced from (set for generated/curated records). */
   pubchemCid?: number
+  /** True when this record was built by parsing a user-supplied SMILES string. */
+  provenance?: "structure"
   props: ChemicalProperties
   sourceRefs: string[]
 }

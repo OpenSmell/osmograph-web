@@ -8,7 +8,7 @@
 // chemical is flagged estimated and the chain's unknown state is honest rather
 // than guessed.
 
-interface AtomNode {
+export interface AtomNode {
   el: string
   aromatic: boolean
   start: number
@@ -16,7 +16,7 @@ interface AtomNode {
   edges: { to: number; bond: 1 | 2 | 3; edge: number; dpos?: number }[]
 }
 
-interface ScanResult {
+export interface ScanResult {
   atoms: AtomNode[]
   ringPairs: [number, number][]
 }
@@ -26,7 +26,7 @@ interface ScanResult {
 // (the form PubChem's property endpoint actually returns — uppercase carbons
 // with alternating `=` bonds). We need to recognise both so a live-fetched
 // provisional chemical can be assigned the same groups as a curated one.
-function scanSmiles(smiles: string): ScanResult {
+export function scanSmiles(smiles: string): ScanResult {
   const atoms: AtomNode[] = []
   const digitToAtoms = new Map<number, number[]>()
   const edgeRecords: { from: number; to: number; bond: 1 | 2 | 3; dpos?: number }[] = []

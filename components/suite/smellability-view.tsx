@@ -59,10 +59,11 @@ import {
   perceptsFor,
   perceptualSummary,
   relevantBoundaries,
+  resolveAndRun,
+  resolveStructure,
   runChemicalVerdict,
   saveToUserDictionary,
   searchSubstances,
-  resolveAndRun,
   type ChainStep,
   type ChainValue,
   type Chemical,
@@ -77,6 +78,7 @@ import {
   type Verdict,
 } from "@/lib/smellability"
 import { rigCapabilityCheck, type RigCapability, type RigPair } from "@/lib/smellability/capability"
+import { StructureCard } from "./structure-card"
 import type { SuiteSession } from "./session-context"
 
 const EXAMPLES = [
@@ -88,6 +90,7 @@ const EXAMPLES = [
   "hand sanitizer",
   "rotten egg",
   "ethanol",
+  "CC(=O)O",
 ]
 
 const VERDICT_META: Record<Verdict, { label: string; text: string; chip: string }> = {
@@ -618,6 +621,11 @@ export function SmellabilityView({
     return []
   }, [verdict])
 
+  const structure = React.useMemo(() => {
+    if (!verdict || verdict.kind !== "chemical") return null
+    return resolveStructure(verdict.entityId)
+  }, [verdict])
+
   React.useEffect(() => {
     const id = requestAnimationFrame(() => {
       try {
@@ -864,7 +872,7 @@ export function SmellabilityView({
               onChange={(e) => handleQuery(e.target.value)}
               onFocus={() => query.trim().length >= 2 && setShowSuggestions(true)}
               onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
-              placeholder="Try a substance — a compound, a food, a product, a smell…"
+              placeholder="Try a substance, or paste a SMILES structure like CCO…"
               className="h-12 pl-10 pr-10 text-base"
               onKeyDown={(e) => {
                 if (e.key === "Enter" && candidates.length > 0) pick(candidates[0])
@@ -967,7 +975,10 @@ export function SmellabilityView({
                 Type anything — a chemical like <span className="font-mono">ethanol</span>, an everyday thing like{" "}
                 <span className="font-mono">banana</span>, or a product like <span className="font-mono">hand sanitizer</span>. The
                 engine resolves it to its volatile chemistry and grades detectability through a physics chain. Not in the
-                dictionary? It resolves anything PubChem knows — live, and honestly flagged as provisional.
+                dictionary? Paste a <span className="font-mono">SMILES</span> structure (e.g.{" "}
+                <span className="font-mono">CC(=O)O</span> for acetic acid) and it is parsed first-principles — formula,
+                weight, Joback boiling point, and vapor pressure — or resolve any name PubChem knows, live and honestly
+                flagged as provisional.
               </p>
             </div>
           </CardContent>
@@ -1122,6 +1133,7 @@ export function SmellabilityView({
 
           <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
             <div className="flex flex-col gap-6">
+              {structure && <StructureCard chemical={structure} />}
               {verdict.kind === "chemical" || verdict.kind === "class" ? (
                 <section className="flex flex-col gap-3">
                   <div className="flex items-center justify-between">

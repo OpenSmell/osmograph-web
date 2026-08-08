@@ -1,6 +1,7 @@
 import { COMPOUNDS, COMPOUND_BY_ID } from "./compounds"
 import { COMPOSITES } from "./composites"
 import { CLASS_TERMS } from "./constants"
+import { isLikelySmiles, registerStructure, structureToChemical } from "./smiles"
 import { readUserDictionary } from "./user-dictionary"
 import type { Composite, ResolvedEntity, SearchCandidate } from "./types"
 
@@ -199,6 +200,27 @@ export function searchSubstances(query: string, limit = 8): SearchCandidate[] {
     }
     results.sort((a, b) => b.score - a.score)
   }
+
+  // A query that parses as a SMILES string is treated as a structure: parse it
+  // into a first-principles Chemical (formula, MW, Joback boiling point, vapor
+  // pressure) and register it so the chain can resolve it. Registered entries
+  // are idempotent (hash-based ids), so repeated keystrokes don't accumulate.
+  if (isLikelySmiles(q)) {
+    const struct = structureToChemical(q)
+    if (struct) {
+      registerStructure(struct)
+      results.push({
+        kind: "chemical",
+        id: struct.id,
+        name: struct.name,
+        displayName: struct.name,
+        matchHint: "structure-parsed (SMILES) · estimated",
+        score: 100,
+      })
+    }
+  }
+
+  results.sort((a, b) => b.score - a.score)
 
   return results.slice(0, limit)
 }

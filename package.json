@@ -8,10 +8,12 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
-    "generate-compounds": "node --experimental-strip-types scripts/generate-compounds.ts"
+    "generate-compounds": "node --experimental-strip-types scripts/generate-compounds.ts",
+    "postinstall": "mkdir -p public/rdkit && cp node_modules/@rdkit/rdkit/dist/RDKit_minimal.* public/rdkit/"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
+    "@rdkit/rdkit": "^2025.3.4-1.0.0",
     "@radix-ui/react-accordion": "^1.2.2",
     "@radix-ui/react-alert-dialog": "^1.1.4",
     "@radix-ui/react-aspect-ratio": "^1.1.1",
