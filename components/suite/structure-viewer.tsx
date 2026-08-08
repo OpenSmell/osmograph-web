@@ -24,7 +24,7 @@ export function StructureViewer({
   height?: number
 }) {
   const ref = React.useRef<HTMLDivElement>(null)
-  const [status, setStatus] = React.useState<"loading" | "ready" | "error">("loading")
+  const [status, setStatus] = React.useState<"loading" | "ready" | "unavailable" | "error">("loading")
   const [error, setError] = React.useState<string | null>(null)
 
   React.useEffect(() => {
@@ -34,10 +34,21 @@ export function StructureViewer({
       if (cancelled || !ref.current || !window.RDKit) return
       try {
         const mol = window.RDKit.get_mol(smiles)
-        if (!mol) throw new Error("Could not parse the structure")
+        if (!mol) {
+          // RDKit rejected the string. The formula and estimated properties
+          // come from our own parser, so degrade the 2D preview instead of
+          // failing the whole card.
+          setStatus("unavailable")
+          setError(null)
+          return
+        }
         const svg = mol.get_svg()
         mol.delete()
-        if (!svg || svg.length < 100) throw new Error("Could not generate a structure drawing")
+        if (!svg || svg.length < 100) {
+          setStatus("unavailable")
+          setError(null)
+          return
+        }
         ref.current.innerHTML = svg
         const el = ref.current.querySelector("svg")
         if (el) {
@@ -96,6 +107,14 @@ export function StructureViewer({
             <Loader2 className="size-4 animate-spin" />
             Initialising structure renderer…
           </div>
+        </div>
+      )}
+      {status === "unavailable" && (
+        <div className="absolute inset-0 flex items-center justify-center bg-background/80">
+          <p className="max-w-[240px] text-center text-xs text-muted-foreground">
+            2D structure preview unavailable for this SMILES — the formula and
+            estimated properties below are still computed from it.
+          </p>
         </div>
       )}
       {status === "error" && (

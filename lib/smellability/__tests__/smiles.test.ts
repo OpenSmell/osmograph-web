@@ -154,6 +154,37 @@ describe("isLikelySmiles — conservative detector", () => {
   })
 })
 
+describe("RDKit-rejected structures — still parse and run, 2D preview degrades", () => {
+  // This SMILES is rejected by RDKit_minimal's get_mol() but passes our own
+  // parser. The structure pipeline must still resolve: formula and estimated
+  // properties come from our parser, and only the 2D preview degrades (see
+  // StructureViewer's "unavailable" state).
+  const RDKIT_REJECTED =
+    "C[C@@]12CC[C@H]3C[C@@H](O)CC[C@@H]4C[C@@H](O)[C@H](O)[C@H]34[C@@]12"
+
+  it("parses to a formula and estimated properties", () => {
+    const p = parseSmiles(RDKIT_REJECTED)
+    expect(p).not.toBeNull()
+    expect(p!.formula.length).toBeGreaterThan(0)
+    expect(p!.counts.C).toBeGreaterThanOrEqual(13)
+    expect(p!.counts.O).toBe(3)
+  })
+
+  it("isLikelySmiles accepts it (structure search entry)", () => {
+    expect(isLikelySmiles(RDKIT_REJECTED)).toBe(true)
+  })
+
+  it("structureToChemical builds a chemical and the chain resolves a verdict", () => {
+    const c = structureToChemical(RDKIT_REJECTED)!
+    expect(c.provenance).toBe("structure")
+    registerStructure(c)
+    expect(resolveStructure(c.id)).toBe(c)
+    const verdict = resolveAndRun(c.id, "chemical")
+    expect(verdict).not.toBeNull()
+    expect(verdict!.steps.map((s) => s.id)).toEqual(["identity", "volatility", "signal", "reactivity"])
+  })
+})
+
 describe("search integration — a SMILES query enters the pipeline as a structure", () => {
   it("searchSubstances surfaces a structure-parsed candidate for CCO", () => {
     const hits = searchSubstances("CCO")

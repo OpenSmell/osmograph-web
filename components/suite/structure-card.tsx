@@ -15,7 +15,7 @@ function Row({ label, value, note }: { label: string; value: string; note?: stri
   return (
     <div className="flex items-baseline justify-between gap-3">
       <span className="shrink-0 text-xs text-muted-foreground">{label}</span>
-      <span className="min-w-0 truncate text-right font-mono text-xs text-foreground">{value}</span>
+      <span className="min-w-0 break-words text-right font-mono text-xs text-foreground">{value}</span>
       {note && <span className="sr-only">{note}</span>}
     </div>
   )
