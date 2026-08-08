@@ -76,6 +76,7 @@ import {
   type SignalStrength,
   type Verdict,
 } from "@/lib/smellability"
+import { rigCapabilityCheck, type RigCapability, type RigPair } from "@/lib/smellability/capability"
 import type { SuiteSession } from "./session-context"
 
 const EXAMPLES = [
@@ -293,6 +294,79 @@ function keyFacts(v: FeasibilityVerdict): ChainValue[] {
   const identity = v.steps.find((s) => s.id === "identity")
   const signal = v.steps.find((s) => s.id === "signal")
   return [...(identity?.values ?? []), ...(signal?.values ?? [])].slice(0, 6)
+}
+
+const RISK_ORDER: Record<RigPair["risk"], number> = { high: 0, medium: 1, low: 2 }
+
+const RISK_META: Record<RigPair["risk"], { label: string; chip: string; dot: string }> = {
+  high: { label: "High risk", chip: "border-red-500/40 bg-red-500/10 text-red-500", dot: "bg-red-500" },
+  medium: { label: "Medium risk", chip: "border-amber-500/40 bg-amber-500/10 text-amber-500", dot: "bg-amber-500" },
+  low: { label: "Low risk", chip: "border-emerald-500/40 bg-emerald-500/10 text-emerald-500", dot: "bg-emerald-500" },
+}
+
+function RigCheckCard({ rig, sensorCount }: { rig: RigCapability; sensorCount: number }) {
+  const counts: Record<RigPair["risk"], number> = { high: 0, medium: 0, low: 0 }
+  for (const p of rig.pairs) counts[p.risk]++
+  const ordered = [...rig.pairs].sort(
+    (x, y) => RISK_ORDER[x.risk] - RISK_ORDER[y.risk] || y.overlap - x.overlap,
+  )
+  return (
+    <Card className="border-border/60">
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center gap-2 text-sm">
+          <FlaskConical className="size-4 text-muted-foreground" />
+          Rig capability check
+        </CardTitle>
+        <CardDescription className="text-xs">
+          Can your {sensorCount}-sensor array tell these apart? Compares the predicted response profiles of every pair on
+          the bench.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-3">
+        {rig.atCapacity && (
+          <div className="flex items-start gap-2 rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs">
+            <AlertTriangle className="mt-0.5 size-3.5 shrink-0 text-amber-500" />
+            <p className="text-amber-700">
+              <span className="font-medium">At capacity.</span> {rig.pinned} pinned substances is more than the ~
+              {rig.maxDistinguishable} this array is expected to resolve — drop some or add sensors for reliable
+              separation.
+            </p>
+          </div>
+        )}
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge variant="secondary">{rig.pinned} pinned</Badge>
+          <Badge variant="secondary">~{rig.maxDistinguishable} resolvable</Badge>
+          {(["high", "medium", "low"] as const).map((r) =>
+            counts[r] > 0 ? (
+              <Badge key={r} className={RISK_META[r].chip}>
+                {counts[r]} {RISK_META[r].label.toLowerCase()}
+              </Badge>
+            ) : null,
+          )}
+        </div>
+        <div className="flex flex-col gap-2">
+          {ordered.map((p) => (
+            <div key={`${p.a}|${p.b}`} className="rounded-lg border border-border/40 bg-background/60 px-3 py-2.5">
+              <div className="flex items-center gap-2">
+                <span className={cn("inline-block size-1.5 shrink-0 rounded-full", RISK_META[p.risk].dot)} />
+                <p className="min-w-0 flex-1 truncate text-sm font-medium">
+                  {p.a} <span className="text-muted-foreground">vs</span> {p.b}
+                </p>
+                <span className="shrink-0 rounded-full border border-border/60 px-2 py-0.5 text-[10px] font-medium tabular-nums text-muted-foreground">
+                  {p.overlap}% overlap
+                </span>
+              </div>
+              <p className="mt-1 pl-3.5 text-xs text-muted-foreground">{p.note}</p>
+            </div>
+          ))}
+        </div>
+        <p className="text-[11px] text-muted-foreground">
+          Overlap is a qualitative estimate of separability, not a calibrated sensor model — verify high-risk pairs with
+          a labeled exposure before trusting separation.
+        </p>
+      </CardContent>
+    </Card>
+  )
 }
 
 function LiveResultCard({
@@ -594,6 +668,11 @@ export function SmellabilityView({
   const compareItems = React.useMemo(
     () => compareIds.map((id) => bench.find((b) => b.entityId === id)).filter((b): b is FeasibilityVerdict => !!b),
     [compareIds, bench],
+  )
+
+  const rigCapability = React.useMemo(
+    () => rigCapabilityCheck(bench, sensorCount),
+    [bench, sensorCount],
   )
 
   function handleQuery(value: string) {
@@ -1357,6 +1436,8 @@ export function SmellabilityView({
             </CardContent>
           </Card>
         )}
+
+        {bench.length >= 2 && <RigCheckCard rig={rigCapability} sensorCount={sensorCount} />}
 
         {benchFocus && (
           <Card className="border-border/60">

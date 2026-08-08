@@ -1,8 +1,8 @@
-import { COMPOUNDS } from "./compounds"
+import { COMPOUNDS, COMPOUND_BY_ID } from "./compounds"
 import { COMPOSITES } from "./composites"
 import { CLASS_TERMS } from "./constants"
 import { readUserDictionary } from "./user-dictionary"
-import type { ResolvedEntity, SearchCandidate } from "./types"
+import type { Composite, ResolvedEntity, SearchCandidate } from "./types"
 
 export function normalizeQuery(q: string): string {
   return q.toLowerCase().replace(/\s+/g, " ").trim()
@@ -62,6 +62,26 @@ function scoreComposite(c: (typeof COMPOSITES)[number], query: string): number {
   return best
 }
 
+// Reverse lookup: typing a constituent (e.g. "citral", "skatole") surfaces the
+// mixtures that contain it, so users can plan by the volatiles they care about.
+// Exact constituent names get a strong but not top score; prefix matches are
+// weaker to avoid crowding exact chemical hits with "ethanol is in everything".
+function constituentLookup(
+  c: Composite,
+  query: string,
+): { score: number; hit: string } | null {
+  for (const k of c.constituents) {
+    const chem = COMPOUND_BY_ID.get(k.chemicalId)
+    if (!chem) continue
+    for (const name of [chem.name, ...chem.synonyms]) {
+      const n = norm(name)
+      if (n === query) return { score: 65, hit: chem.name }
+      if (query.length >= 4 && n.startsWith(query)) return { score: 45, hit: chem.name }
+    }
+  }
+  return null
+}
+
 export function searchSubstances(query: string, limit = 8): SearchCandidate[] {
   const q = normalizeQuery(query)
   if (q.length < 1) return []
@@ -97,9 +117,11 @@ export function searchSubstances(query: string, limit = 8): SearchCandidate[] {
     }
   }
 
+  const compositeIds = new Set<string>()
   for (const c of COMPOSITES) {
     const score = scoreComposite(c, q)
     if (score >= 40) {
+      compositeIds.add(c.id)
       results.push({
         kind: "composite",
         id: c.id,
@@ -107,6 +129,22 @@ export function searchSubstances(query: string, limit = 8): SearchCandidate[] {
         displayName: c.name,
         matchHint: `${c.kind} · mixture profile`,
         score,
+      })
+    }
+  }
+
+  // Constituent reverse-lookup (see constituentLookup above).
+  for (const c of COMPOSITES) {
+    if (compositeIds.has(c.id)) continue
+    const hit = constituentLookup(c, q)
+    if (hit) {
+      results.push({
+        kind: "composite",
+        id: c.id,
+        name: c.name,
+        displayName: c.name,
+        matchHint: `contains ${hit.hit}`,
+        score: hit.score,
       })
     }
   }

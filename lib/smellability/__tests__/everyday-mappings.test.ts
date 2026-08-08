@@ -92,6 +92,11 @@ const MAPS: [string, string][] = [
   ["hydrogen peroxide and vinegar", "peroxide-vinegar"],
   ["vinegar and baking soda", "vinegar-baking-soda"],
   ["lemon juice and baking soda", "lemon-baking-soda"],
+  ["ginger", "ginger"],
+  ["ginger root", "ginger"],
+  ["fresh ginger", "ginger"],
+  ["cumin", "cumin"],
+  ["jeera", "cumin"],
 ]
 
 describe("everyday top-1 mappings", () => {

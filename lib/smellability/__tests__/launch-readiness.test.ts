@@ -102,6 +102,15 @@ describe("launch readiness", () => {
     expect(runChemicalVerdict(co2!).verdict).toBe("red")
   })
 
+  it("constituent reverse-lookup surfaces containing profiles", () => {
+    // Typing a key volatile should surface the mixtures that contain it.
+    const citral = searchSubstances("citral", 20)
+    expect(citral.some((x) => x.id === "ginger"), "citral -> ginger").toBe(true)
+    expect(citral.some((x) => x.matchHint.startsWith("contains"))).toBe(true)
+    const limonene = searchSubstances("limonene", 20)
+    expect(limonene.some((x) => x.matchHint.startsWith("contains"))).toBe(true)
+  })
+
   it("reaction composites carry reaction/hazard flags through the chain", () => {
     const reaction = COMPOSITES.filter((c) => c.reaction)
     expect(reaction.length).toBeGreaterThanOrEqual(4)
