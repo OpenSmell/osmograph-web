@@ -17,7 +17,7 @@ export function buildProvisionalChemical(
 
   const functionalGroups = inferFunctionalGroups(enriched.smiles)
   const name = enriched.name.trim().toLowerCase()
-  const inorganic = /^(n2|o2|co2|ar|he|ne)$/.test(name) || /^(n|o2?|co2|argon|helium|neon|nitrogen|oxygen|carbon dioxide)$/.test(name)
+  const inorganic = /^(n2|o2|co2|ar|he|ne|kr|xe|rn)$/.test(name) || /^(n|o2?|co2|argon|helium|neon|krypton|xenon|radon|nitrogen|oxygen|carbon dioxide)$/.test(name)
   // Reducing gases (H2, CO, H2S, NH3) and organic molecules are redox-active at
   // MOX operating temperature; oxidizing gases (O3, Cl2, NO2) respond too — in
   // the opposite direction (resistance rises). True inerts (N2, O2, CO2, noble

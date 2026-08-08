@@ -189,8 +189,8 @@ function buildChemical(f: Fetched) {
   const groups = smiles ? inferFunctionalGroups(smiles) : []
   const lower = f.name.toLowerCase()
   const inorganicInert =
-    /^(n2|o2|co2|ar|he|ne)$/.test(lower) ||
-    /^(n|o2?|co2|argon|helium|neon|nitrogen|oxygen|carbon dioxide)$/.test(lower)
+    /^(n2|o2|co2|ar|he|ne|kr|xe|rn)$/.test(lower) ||
+    /^(n|o2?|co2|argon|helium|neon|krypton|xenon|radon|nitrogen|oxygen|carbon dioxide)$/.test(lower)
   const reducingGas = /^(h2|co|h2s|nh3|hydrogen|hydrogen sulfide|carbon monoxide|ammonia)$/.test(lower)
   const oxidizingGas = /^(o3|cl2|no2|no|chlorine|ozone|nitrogen dioxide|nitrogen monoxide|nitric oxide)$/.test(lower)
   const bp = f.boilingPointC

@@ -93,9 +93,10 @@ const BP_TIMEOUT_MS = 8000
 export function parseBoilingPoint(raw: unknown): number | null {
   if (typeof raw !== "string") return null
   // pug_view often reports "281.6±35.0 °C" — the value before the ± range is
-  // the reported boiling point, not the uncertainty.
-  const m = raw.match(/(\d+(?:\.\d+)?)\s*(?:±[^°\d]*\d+(?:\.\d+)?)?\s*°?\s*C/i)
-  if (m) return Number(m[1])
+  // the reported boiling point, not the uncertainty. Negative values may use a
+  // Unicode minus sign ("−185.85 °C"); the sign must be preserved.
+  const m = raw.match(/([-−]?)(\d+(?:\.\d+)?)\s*(?:±[^°\d]*\d+(?:\.\d+)?)?\s*°?\s*C/i)
+  if (m) return (m[1] === "-" || m[1] === "−" ? -1 : 1) * Number(m[2])
   return null
 }
 

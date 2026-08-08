@@ -1,12 +1,45 @@
 // AUTO-GENERATED — do not edit by hand.
 // Regenerate: node --experimental-strip-types scripts/generate-compounds.ts
-// Data sources: PubChem (CID 104 compounds) + OpenSmell odor_search_index.
-// Generated: 2026-08-07T23:08:02.749Z
+// Data sources: PubChem (CID 138 compounds) + OpenSmell odor_search_index.
+// Generated: 2026-08-07T23:39:56.217Z
 import type { Chemical } from "./types"
 
-export const GENERATED_AT = "2026-08-07T23:08:02.749Z"
+export const GENERATED_AT = "2026-08-07T23:39:56.217Z"
 
 export const GENERATED_COMPOUNDS: Chemical[] = [
+  {
+    "id": "gen-174",
+    "name": "ethane-1,2-diol",
+    "synonyms": [
+      "ethylene glycol",
+    ],
+    "pubchemCid": 174,
+    "smiles": "C(CO)O",
+    "props": {
+      "molecularWeight": {
+        "value": 62.07,
+        "source": "measured",
+        "note": "PubChem",
+      },
+      "boilingPoint": {
+        "value": 197.3,
+        "source": "measured",
+        "note": "PubChem experimental (pug_view)",
+      },
+      "vaporPressure25": {
+        "value": 223.4761861824491,
+        "source": "estimated",
+        "note": "Clausius-Clapeyron + Trouton from PubChem boiling point",
+      },
+      "functionalGroups": [
+        "alcohol",
+      ],
+      "redoxActive": true,
+    },
+    "sourceRefs": [
+      "PubChem CID 174", "PubChem pug_view (experimental boiling point)",
+    ],
+  },
   {
     "id": "gen-179",
     "name": "3-hydroxybutan-2-one",
@@ -73,6 +106,40 @@ export const GENERATED_COMPOUNDS: Chemical[] = [
     },
     "sourceRefs": [
       "PubChem CID 240", "PubChem pug_view (experimental boiling point)", "odor: flavornet", "odor: goodscents", "odor: dravnieks_1985", "odor: aromadb",
+    ],
+  },
+  {
+    "id": "gen-243",
+    "name": "benzoic acid",
+    "synonyms": [
+      "benzoic acid",
+    ],
+    "pubchemCid": 243,
+    "smiles": "C1=CC=C(C=C1)C(=O)O",
+    "props": {
+      "molecularWeight": {
+        "value": 122.12,
+        "source": "measured",
+        "note": "PubChem",
+      },
+      "boilingPoint": {
+        "value": 249.2,
+        "source": "measured",
+        "note": "PubChem experimental (pug_view)",
+      },
+      "vaporPressure25": {
+        "value": 35.40363923989205,
+        "source": "estimated",
+        "note": "Clausius-Clapeyron + Trouton from PubChem boiling point",
+      },
+      "functionalGroups": [
+        "aromatic", "carboxylic acid",
+      ],
+      "redoxActive": true,
+      "odorDescriptor": "urine, balsamic, almond",
+    },
+    "sourceRefs": [
+      "PubChem CID 243", "PubChem pug_view (experimental boiling point)", "odor: flavornet", "odor: goodscents", "odor: aromadb",
     ],
   },
   {
@@ -144,6 +211,72 @@ export const GENERATED_COMPOUNDS: Chemical[] = [
     ],
   },
   {
+    "id": "gen-284",
+    "name": "formic acid",
+    "synonyms": [
+      "formic acid",
+    ],
+    "pubchemCid": 284,
+    "smiles": "C(=O)O",
+    "props": {
+      "molecularWeight": {
+        "value": 46.025,
+        "source": "measured",
+        "note": "PubChem",
+      },
+      "boilingPoint": {
+        "value": 101,
+        "source": "measured",
+        "note": "PubChem experimental (pug_view)",
+      },
+      "vaporPressure25": {
+        "value": 6822.829346311235,
+        "source": "estimated",
+        "note": "Clausius-Clapeyron + Trouton from PubChem boiling point",
+      },
+      "functionalGroups": [
+        "carboxylic acid",
+      ],
+      "redoxActive": true,
+      "odorDescriptor": "fermented, acetic, fruity, vinegar, pungent, sharp",
+    },
+    "sourceRefs": [
+      "PubChem CID 284", "PubChem pug_view (experimental boiling point)", "odor: goodscents",
+    ],
+  },
+  {
+    "id": "gen-311",
+    "name": "2-hydroxypropane-1,2,3-tricarboxylic acid",
+    "synonyms": [
+      "citric acid",
+    ],
+    "pubchemCid": 311,
+    "smiles": "C(C(=O)O)C(CC(=O)O)(C(=O)O)O",
+    "props": {
+      "molecularWeight": {
+        "value": 192.12,
+        "source": "measured",
+        "note": "PubChem",
+      },
+      "boilingPoint": {
+        "value": null,
+        "source": "unknown",
+      },
+      "vaporPressure25": {
+        "value": null,
+        "source": "unknown",
+      },
+      "functionalGroups": [
+        "carboxylic acid", "alcohol",
+      ],
+      "redoxActive": true,
+      "odorDescriptor": "odorless",
+    },
+    "sourceRefs": [
+      "PubChem CID 311", "odor: goodscents",
+    ],
+  },
+  {
     "id": "gen-323",
     "name": "chromen-2-one",
     "synonyms": [
@@ -175,6 +308,40 @@ export const GENERATED_COMPOUNDS: Chemical[] = [
     },
     "sourceRefs": [
       "PubChem CID 323", "PubChem pug_view (experimental boiling point)", "odor: flavornet", "odor: goodscents", "odor: dravnieks_1985",
+    ],
+  },
+  {
+    "id": "gen-338",
+    "name": "2-hydroxybenzoic acid",
+    "synonyms": [
+      "salicylic acid",
+    ],
+    "pubchemCid": 338,
+    "smiles": "C1=CC=C(C(=C1)C(=O)O)O",
+    "props": {
+      "molecularWeight": {
+        "value": 138.12,
+        "source": "measured",
+        "note": "PubChem",
+      },
+      "boilingPoint": {
+        "value": 211,
+        "source": "measured",
+        "note": "PubChem experimental (pug_view)",
+      },
+      "vaporPressure25": {
+        "value": 137.40657567995117,
+        "source": "estimated",
+        "note": "Clausius-Clapeyron + Trouton from PubChem boiling point",
+      },
+      "functionalGroups": [
+        "aromatic", "carboxylic acid", "phenol",
+      ],
+      "redoxActive": true,
+      "odorDescriptor": "phenolic, nutty",
+    },
+    "sourceRefs": [
+      "PubChem CID 338", "PubChem pug_view (experimental boiling point)", "odor: goodscents", "odor: aromadb",
     ],
   },
   {
@@ -280,6 +447,40 @@ export const GENERATED_COMPOUNDS: Chemical[] = [
     ],
   },
   {
+    "id": "gen-612",
+    "name": "2-hydroxypropanoic acid",
+    "synonyms": [
+      "lactic acid",
+    ],
+    "pubchemCid": 612,
+    "smiles": "CC(C(=O)O)O",
+    "props": {
+      "molecularWeight": {
+        "value": 90.08,
+        "source": "measured",
+        "note": "PubChem",
+      },
+      "boilingPoint": {
+        "value": 122,
+        "source": "measured",
+        "note": "PubChem experimental (pug_view)",
+      },
+      "vaporPressure25": {
+        "value": 3237.3592904046523,
+        "source": "estimated",
+        "note": "Clausius-Clapeyron + Trouton from PubChem boiling point",
+      },
+      "functionalGroups": [
+        "carboxylic acid", "alcohol",
+      ],
+      "redoxActive": true,
+      "odorDescriptor": "odorless",
+    },
+    "sourceRefs": [
+      "PubChem CID 612", "PubChem pug_view (experimental boiling point)", "odor: goodscents",
+    ],
+  },
+  {
     "id": "gen-712",
     "name": "formaldehyde",
     "synonyms": [
@@ -314,6 +515,102 @@ export const GENERATED_COMPOUNDS: Chemical[] = [
     ],
   },
   {
+    "id": "gen-753",
+    "name": "propane-1,2,3-triol",
+    "synonyms": [
+      "glycerol",
+    ],
+    "pubchemCid": 753,
+    "smiles": "C(C(CO)O)O",
+    "props": {
+      "molecularWeight": {
+        "value": 92.09,
+        "source": "measured",
+        "note": "PubChem",
+      },
+      "boilingPoint": {
+        "value": 290,
+        "source": "measured",
+        "note": "PubChem experimental (pug_view)",
+      },
+      "vaporPressure25": {
+        "value": 8.317676791101828,
+        "source": "estimated",
+        "note": "Clausius-Clapeyron + Trouton from PubChem boiling point",
+      },
+      "functionalGroups": [
+        "alcohol",
+      ],
+      "redoxActive": true,
+      "odorDescriptor": "odorless",
+    },
+    "sourceRefs": [
+      "PubChem CID 753", "PubChem pug_view (experimental boiling point)", "odor: goodscents",
+    ],
+  },
+  {
+    "id": "gen-768",
+    "name": "formonitrile",
+    "synonyms": [
+      "hydrogen cyanide",
+    ],
+    "pubchemCid": 768,
+    "smiles": "C#N",
+    "props": {
+      "molecularWeight": {
+        "value": 27.025,
+        "source": "measured",
+        "note": "PubChem",
+      },
+      "boilingPoint": {
+        "value": 25.63,
+        "source": "measured",
+        "note": "PubChem experimental (pug_view)",
+      },
+      "vaporPressure25": {
+        "value": 99083.97114884276,
+        "source": "estimated",
+        "note": "Clausius-Clapeyron + Trouton from PubChem boiling point",
+      },
+      "functionalGroups": [],
+      "redoxActive": false,
+    },
+    "sourceRefs": [
+      "PubChem CID 768", "PubChem pug_view (experimental boiling point)",
+    ],
+  },
+  {
+    "id": "gen-784",
+    "name": "hydrogen peroxide",
+    "synonyms": [
+      "hydrogen peroxide",
+    ],
+    "pubchemCid": 784,
+    "smiles": "OO",
+    "props": {
+      "molecularWeight": {
+        "value": 34.015,
+        "source": "measured",
+        "note": "PubChem",
+      },
+      "boilingPoint": {
+        "value": 108,
+        "source": "measured",
+        "note": "PubChem experimental (pug_view)",
+      },
+      "vaporPressure25": {
+        "value": 5321.572373133779,
+        "source": "estimated",
+        "note": "Clausius-Clapeyron + Trouton from PubChem boiling point",
+      },
+      "functionalGroups": [],
+      "redoxActive": false,
+    },
+    "sourceRefs": [
+      "PubChem CID 784", "PubChem pug_view (experimental boiling point)",
+    ],
+  },
+  {
     "id": "gen-798",
     "name": "1H-indole",
     "synonyms": [
@@ -345,6 +642,37 @@ export const GENERATED_COMPOUNDS: Chemical[] = [
     },
     "sourceRefs": [
       "PubChem CID 798", "PubChem pug_view (experimental boiling point)", "odor: flavornet", "odor: goodscents", "odor: dravnieks_1985", "odor: aromadb",
+    ],
+  },
+  {
+    "id": "gen-807",
+    "name": "molecular iodine",
+    "synonyms": [
+      "iodine",
+    ],
+    "pubchemCid": 807,
+    "smiles": "II",
+    "props": {
+      "molecularWeight": {
+        "value": 253.8089,
+        "source": "measured",
+        "note": "PubChem",
+      },
+      "boilingPoint": {
+        "value": 184.4,
+        "source": "measured",
+        "note": "PubChem experimental (pug_view)",
+      },
+      "vaporPressure25": {
+        "value": 353.2813838751782,
+        "source": "estimated",
+        "note": "Clausius-Clapeyron + Trouton from PubChem boiling point",
+      },
+      "functionalGroups": [],
+      "redoxActive": false,
+    },
+    "sourceRefs": [
+      "PubChem CID 807", "PubChem pug_view (experimental boiling point)",
     ],
   },
   {
@@ -413,6 +741,40 @@ export const GENERATED_COMPOUNDS: Chemical[] = [
     },
     "sourceRefs": [
       "PubChem CID 998", "PubChem pug_view (experimental boiling point)", "odor: flavornet", "odor: goodscents", "odor: aromadb",
+    ],
+  },
+  {
+    "id": "gen-1030",
+    "name": "propane-1,2-diol",
+    "synonyms": [
+      "propylene glycol",
+    ],
+    "pubchemCid": 1030,
+    "smiles": "CC(CO)O",
+    "props": {
+      "molecularWeight": {
+        "value": 76.09,
+        "source": "measured",
+        "note": "PubChem",
+      },
+      "boilingPoint": {
+        "value": 187.6,
+        "source": "measured",
+        "note": "PubChem experimental (pug_view)",
+      },
+      "vaporPressure25": {
+        "value": 315.34345549380595,
+        "source": "estimated",
+        "note": "Clausius-Clapeyron + Trouton from PubChem boiling point",
+      },
+      "functionalGroups": [
+        "alcohol",
+      ],
+      "redoxActive": true,
+      "odorDescriptor": "odorless",
+    },
+    "sourceRefs": [
+      "PubChem CID 1030", "PubChem pug_view (experimental boiling point)", "odor: goodscents",
     ],
   },
   {
@@ -621,6 +983,37 @@ export const GENERATED_COMPOUNDS: Chemical[] = [
     ],
   },
   {
+    "id": "gen-1176",
+    "name": "urea",
+    "synonyms": [
+      "urea",
+    ],
+    "pubchemCid": 1176,
+    "smiles": "C(=O)(N)N",
+    "props": {
+      "molecularWeight": {
+        "value": 60.056,
+        "source": "measured",
+        "note": "PubChem",
+      },
+      "boilingPoint": {
+        "value": null,
+        "source": "unknown",
+      },
+      "vaporPressure25": {
+        "value": null,
+        "source": "unknown",
+      },
+      "functionalGroups": [
+        "aldehyde", "amine",
+      ],
+      "redoxActive": true,
+    },
+    "sourceRefs": [
+      "PubChem CID 1176",
+    ],
+  },
+  {
     "id": "gen-1183",
     "name": "4-hydroxy-3-methoxybenzaldehyde",
     "synonyms": [
@@ -652,6 +1045,73 @@ export const GENERATED_COMPOUNDS: Chemical[] = [
     },
     "sourceRefs": [
       "PubChem CID 1183", "PubChem pug_view (experimental boiling point)", "odor: flavornet", "odor: goodscents", "odor: dravnieks_1985", "odor: aromadb",
+    ],
+  },
+  {
+    "id": "gen-2244",
+    "name": "2-acetyloxybenzoic acid",
+    "synonyms": [
+      "aspirin",
+    ],
+    "pubchemCid": 2244,
+    "smiles": "CC(=O)OC1=CC=CC=C1C(=O)O",
+    "props": {
+      "molecularWeight": {
+        "value": 180.16,
+        "source": "measured",
+        "note": "PubChem",
+      },
+      "boilingPoint": {
+        "value": 140,
+        "source": "measured",
+        "note": "PubChem experimental (pug_view)",
+      },
+      "vaporPressure25": {
+        "value": 1708.71906903287,
+        "source": "estimated",
+        "note": "Clausius-Clapeyron + Trouton from PubChem boiling point",
+      },
+      "functionalGroups": [
+        "aromatic", "ester", "carboxylic acid",
+      ],
+      "redoxActive": true,
+    },
+    "sourceRefs": [
+      "PubChem CID 2244", "PubChem pug_view (experimental boiling point)",
+    ],
+  },
+  {
+    "id": "gen-2519",
+    "name": "1,3,7-trimethylpurine-2,6-dione",
+    "synonyms": [
+      "caffeine",
+    ],
+    "pubchemCid": 2519,
+    "smiles": "CN1C=NC2=C1C(=O)N(C(=O)N2C)C",
+    "props": {
+      "molecularWeight": {
+        "value": 194.19,
+        "source": "measured",
+        "note": "PubChem",
+      },
+      "boilingPoint": {
+        "value": 178,
+        "source": "measured",
+        "note": "PubChem experimental (pug_view)",
+      },
+      "vaporPressure25": {
+        "value": 443.3989029906334,
+        "source": "estimated",
+        "note": "Clausius-Clapeyron + Trouton from PubChem boiling point",
+      },
+      "functionalGroups": [
+        "aldehyde", "amine", "alkene",
+      ],
+      "redoxActive": true,
+      "odorDescriptor": "odorless",
+    },
+    "sourceRefs": [
+      "PubChem CID 2519", "PubChem pug_view (experimental boiling point)", "odor: goodscents",
     ],
   },
   {
@@ -824,6 +1284,101 @@ export const GENERATED_COMPOUNDS: Chemical[] = [
     ],
   },
   {
+    "id": "gen-5416",
+    "name": "krypton",
+    "synonyms": [
+      "krypton",
+    ],
+    "pubchemCid": 5416,
+    "smiles": "[Kr]",
+    "props": {
+      "molecularWeight": {
+        "value": 83.8,
+        "source": "measured",
+        "note": "PubChem",
+      },
+      "boilingPoint": {
+        "value": -153,
+        "source": "measured",
+        "note": "PubChem experimental (pug_view)",
+      },
+      "vaporPressure25": {
+        "value": 56244930.11089978,
+        "source": "estimated",
+        "note": "Clausius-Clapeyron + Trouton from PubChem boiling point",
+      },
+      "functionalGroups": [],
+      "redoxActive": false,
+      "nonRedox": true,
+      "gas": true,
+    },
+    "sourceRefs": [
+      "PubChem CID 5416", "PubChem pug_view (experimental boiling point)",
+    ],
+  },
+  {
+    "id": "gen-5793",
+    "name": "(3R,4S,5S,6R)-6-(hydroxymethyl)oxane-2,3,4,5-tetrol",
+    "synonyms": [
+      "glucose",
+    ],
+    "pubchemCid": 5793,
+    "smiles": "C([C@@H]1[C@H]([C@@H]([C@H](C(O1)O)O)O)O)O",
+    "props": {
+      "molecularWeight": {
+        "value": 180.16,
+        "source": "measured",
+        "note": "PubChem",
+      },
+      "boilingPoint": {
+        "value": null,
+        "source": "unknown",
+      },
+      "vaporPressure25": {
+        "value": null,
+        "source": "unknown",
+      },
+      "functionalGroups": [
+        "alcohol", "ether",
+      ],
+      "redoxActive": true,
+    },
+    "sourceRefs": [
+      "PubChem CID 5793",
+    ],
+  },
+  {
+    "id": "gen-5943",
+    "name": "tetrachloromethane",
+    "synonyms": [
+      "carbon tetrachloride",
+    ],
+    "pubchemCid": 5943,
+    "smiles": "C(Cl)(Cl)(Cl)Cl",
+    "props": {
+      "molecularWeight": {
+        "value": 153.8,
+        "source": "measured",
+        "note": "PubChem",
+      },
+      "boilingPoint": {
+        "value": 76.7,
+        "source": "measured",
+        "note": "PubChem experimental (pug_view)",
+      },
+      "vaporPressure25": {
+        "value": 16166.530506624364,
+        "source": "estimated",
+        "note": "Clausius-Clapeyron + Trouton from PubChem boiling point",
+      },
+      "functionalGroups": [],
+      "redoxActive": false,
+    },
+    "sourceRefs": [
+      "PubChem CID 5943", "PubChem pug_view (experimental boiling point)",
+    ],
+  },
+  {
     "id": "gen-5971",
     "name": "3-isothiocyanatoprop-1-ene",
     "synonyms": [
@@ -858,6 +1413,37 @@ export const GENERATED_COMPOUNDS: Chemical[] = [
     ],
   },
   {
+    "id": "gen-5988",
+    "name": "(2R,3R,4S,5S,6R)-2-[(2S,3S,4S,5R)-3,4-dihydroxy-2,5-bis(hydroxymethyl)oxolan-2-yl]oxy-6-(hydroxymethyl)oxane-3,4,5-triol",
+    "synonyms": [
+      "sucrose",
+    ],
+    "pubchemCid": 5988,
+    "smiles": "C([C@@H]1[C@H]([C@@H]([C@H]([C@H](O1)O[C@]2([C@H]([C@@H]([C@H](O2)CO)O)O)CO)O)O)O)O",
+    "props": {
+      "molecularWeight": {
+        "value": 342.3,
+        "source": "measured",
+        "note": "PubChem",
+      },
+      "boilingPoint": {
+        "value": null,
+        "source": "unknown",
+      },
+      "vaporPressure25": {
+        "value": null,
+        "source": "unknown",
+      },
+      "functionalGroups": [
+        "alcohol", "ether",
+      ],
+      "redoxActive": true,
+    },
+    "sourceRefs": [
+      "PubChem CID 5988",
+    ],
+  },
+  {
     "id": "gen-6054",
     "name": "2-phenylethanol",
     "synonyms": [
@@ -889,6 +1475,37 @@ export const GENERATED_COMPOUNDS: Chemical[] = [
     },
     "sourceRefs": [
       "PubChem CID 6054", "PubChem pug_view (experimental boiling point)", "odor: flavornet", "odor: goodscents", "odor: dravnieks_1985", "odor: aromadb",
+    ],
+  },
+  {
+    "id": "gen-6212",
+    "name": "chloroform",
+    "synonyms": [
+      "chloroform",
+    ],
+    "pubchemCid": 6212,
+    "smiles": "C(Cl)(Cl)Cl",
+    "props": {
+      "molecularWeight": {
+        "value": 119.37,
+        "source": "measured",
+        "note": "PubChem",
+      },
+      "boilingPoint": {
+        "value": 61.12,
+        "source": "measured",
+        "note": "PubChem experimental (pug_view)",
+      },
+      "vaporPressure25": {
+        "value": 28107.74516214415,
+        "source": "estimated",
+        "note": "Clausius-Clapeyron + Trouton from PubChem boiling point",
+      },
+      "functionalGroups": [],
+      "redoxActive": false,
+    },
+    "sourceRefs": [
+      "PubChem CID 6212", "PubChem pug_view (experimental boiling point)",
     ],
   },
   {
@@ -960,6 +1577,71 @@ export const GENERATED_COMPOUNDS: Chemical[] = [
     ],
   },
   {
+    "id": "gen-6344",
+    "name": "dichloromethane",
+    "synonyms": [
+      "dichloromethane",
+    ],
+    "pubchemCid": 6344,
+    "smiles": "C(Cl)Cl",
+    "props": {
+      "molecularWeight": {
+        "value": 84.93,
+        "source": "measured",
+        "note": "PubChem",
+      },
+      "boilingPoint": {
+        "value": 39.75,
+        "source": "measured",
+        "note": "PubChem experimental (pug_view)",
+      },
+      "vaporPressure25": {
+        "value": 60021.134154869615,
+        "source": "estimated",
+        "note": "Clausius-Clapeyron + Trouton from PubChem boiling point",
+      },
+      "functionalGroups": [],
+      "redoxActive": false,
+    },
+    "sourceRefs": [
+      "PubChem CID 6344", "PubChem pug_view (experimental boiling point)",
+    ],
+  },
+  {
+    "id": "gen-6360",
+    "name": "2-methylpropane",
+    "synonyms": [
+      "isobutane",
+    ],
+    "pubchemCid": 6360,
+    "smiles": "CC(C)C",
+    "props": {
+      "molecularWeight": {
+        "value": 58.12,
+        "source": "measured",
+        "note": "PubChem",
+      },
+      "boilingPoint": {
+        "value": 11.7,
+        "source": "measured",
+        "note": "PubChem experimental (pug_view)",
+      },
+      "vaporPressure25": {
+        "value": 162470.0187352119,
+        "source": "estimated",
+        "note": "Clausius-Clapeyron + Trouton from PubChem boiling point",
+      },
+      "functionalGroups": [
+        "alkane",
+      ],
+      "redoxActive": true,
+      "gas": true,
+    },
+    "sourceRefs": [
+      "PubChem CID 6360", "PubChem pug_view (experimental boiling point)",
+    ],
+  },
+  {
     "id": "gen-6387",
     "name": "2-methylpropane-2-thiol",
     "synonyms": [
@@ -991,6 +1673,73 @@ export const GENERATED_COMPOUNDS: Chemical[] = [
     },
     "sourceRefs": [
       "PubChem CID 6387", "PubChem pug_view (experimental boiling point)", "odor: goodscents",
+    ],
+  },
+  {
+    "id": "gen-6557",
+    "name": "2-methylbuta-1,3-diene",
+    "synonyms": [
+      "isoprene",
+    ],
+    "pubchemCid": 6557,
+    "smiles": "CC(=C)C=C",
+    "props": {
+      "molecularWeight": {
+        "value": 68.12,
+        "source": "measured",
+        "note": "PubChem",
+      },
+      "boilingPoint": {
+        "value": 34.067,
+        "source": "measured",
+        "note": "PubChem experimental (pug_view)",
+      },
+      "vaporPressure25": {
+        "value": 73438.45014685059,
+        "source": "estimated",
+        "note": "Clausius-Clapeyron + Trouton from PubChem boiling point",
+      },
+      "functionalGroups": [
+        "alkene",
+      ],
+      "redoxActive": true,
+    },
+    "sourceRefs": [
+      "PubChem CID 6557", "PubChem pug_view (experimental boiling point)",
+    ],
+  },
+  {
+    "id": "gen-6560",
+    "name": "2-methylpropan-1-ol",
+    "synonyms": [
+      "isobutanol",
+    ],
+    "pubchemCid": 6560,
+    "smiles": "CC(C)CO",
+    "props": {
+      "molecularWeight": {
+        "value": 74.12,
+        "source": "measured",
+        "note": "PubChem",
+      },
+      "boilingPoint": {
+        "value": 108,
+        "source": "measured",
+        "note": "PubChem experimental (pug_view)",
+      },
+      "vaporPressure25": {
+        "value": 5321.572373133779,
+        "source": "estimated",
+        "note": "Clausius-Clapeyron + Trouton from PubChem boiling point",
+      },
+      "functionalGroups": [
+        "alcohol",
+      ],
+      "redoxActive": true,
+      "odorDescriptor": "solvent, wine, ethereal, winey, bitter",
+    },
+    "sourceRefs": [
+      "PubChem CID 6560", "PubChem pug_view (experimental boiling point)", "odor: flavornet", "odor: goodscents",
     ],
   },
   {
@@ -1533,6 +2282,40 @@ export const GENERATED_COMPOUNDS: Chemical[] = [
     },
     "sourceRefs": [
       "PubChem CID 7794", "PubChem pug_view (experimental boiling point)", "odor: flavornet", "odor: goodscents", "odor: aromadb",
+    ],
+  },
+  {
+    "id": "gen-7845",
+    "name": "buta-1,3-diene",
+    "synonyms": [
+      "butadiene",
+    ],
+    "pubchemCid": 7845,
+    "smiles": "C=CC=C",
+    "props": {
+      "molecularWeight": {
+        "value": 54.09,
+        "source": "measured",
+        "note": "PubChem",
+      },
+      "boilingPoint": {
+        "value": 4.5,
+        "source": "measured",
+        "note": "PubChem experimental (pug_view)",
+      },
+      "vaporPressure25": {
+        "value": 209788.3294039296,
+        "source": "estimated",
+        "note": "Clausius-Clapeyron + Trouton from PubChem boiling point",
+      },
+      "functionalGroups": [
+        "alkene",
+      ],
+      "redoxActive": true,
+      "gas": true,
+    },
+    "sourceRefs": [
+      "PubChem CID 7845", "PubChem pug_view (experimental boiling point)",
     ],
   },
   {
@@ -2690,6 +3473,164 @@ export const GENERATED_COMPOUNDS: Chemical[] = [
     ],
   },
   {
+    "id": "gen-23935",
+    "name": "neon",
+    "synonyms": [
+      "neon",
+    ],
+    "pubchemCid": 23935,
+    "smiles": "[Ne]",
+    "props": {
+      "molecularWeight": {
+        "value": 20.18,
+        "source": "measured",
+        "note": "PubChem",
+      },
+      "boilingPoint": {
+        "value": null,
+        "source": "unknown",
+      },
+      "vaporPressure25": {
+        "value": null,
+        "source": "unknown",
+      },
+      "functionalGroups": [],
+      "redoxActive": false,
+      "nonRedox": true,
+    },
+    "sourceRefs": [
+      "PubChem CID 23935",
+    ],
+  },
+  {
+    "id": "gen-23968",
+    "name": "argon",
+    "synonyms": [
+      "argon",
+    ],
+    "pubchemCid": 23968,
+    "smiles": "[Ar]",
+    "props": {
+      "molecularWeight": {
+        "value": 39.9,
+        "source": "measured",
+        "note": "PubChem",
+      },
+      "boilingPoint": {
+        "value": -185.847,
+        "source": "measured",
+        "note": "PubChem experimental (pug_view)",
+      },
+      "vaporPressure25": {
+        "value": 180514277.35247514,
+        "source": "estimated",
+        "note": "Clausius-Clapeyron + Trouton from PubChem boiling point",
+      },
+      "functionalGroups": [],
+      "redoxActive": false,
+      "nonRedox": true,
+      "gas": true,
+    },
+    "sourceRefs": [
+      "PubChem CID 23968", "PubChem pug_view (experimental boiling point)",
+    ],
+  },
+  {
+    "id": "gen-23987",
+    "name": "helium",
+    "synonyms": [
+      "helium",
+    ],
+    "pubchemCid": 23987,
+    "smiles": "[He]",
+    "props": {
+      "molecularWeight": {
+        "value": 4.0026,
+        "source": "measured",
+        "note": "PubChem",
+      },
+      "boilingPoint": {
+        "value": null,
+        "source": "unknown",
+      },
+      "vaporPressure25": {
+        "value": null,
+        "source": "unknown",
+      },
+      "functionalGroups": [],
+      "redoxActive": false,
+      "nonRedox": true,
+      "odorDescriptor": "odorless",
+    },
+    "sourceRefs": [
+      "PubChem CID 23987", "odor: goodscents",
+    ],
+  },
+  {
+    "id": "gen-23991",
+    "name": "xenon",
+    "synonyms": [
+      "xenon",
+    ],
+    "pubchemCid": 23991,
+    "smiles": "[Xe]",
+    "props": {
+      "molecularWeight": {
+        "value": 131.29,
+        "source": "measured",
+        "note": "PubChem",
+      },
+      "boilingPoint": {
+        "value": -108.1,
+        "source": "measured",
+        "note": "PubChem experimental (pug_view)",
+      },
+      "vaporPressure25": {
+        "value": 11424167.784283107,
+        "source": "estimated",
+        "note": "Clausius-Clapeyron + Trouton from PubChem boiling point",
+      },
+      "functionalGroups": [],
+      "redoxActive": false,
+      "nonRedox": true,
+      "gas": true,
+    },
+    "sourceRefs": [
+      "PubChem CID 23991", "PubChem pug_view (experimental boiling point)",
+    ],
+  },
+  {
+    "id": "gen-24408",
+    "name": "molecular bromine",
+    "synonyms": [
+      "bromine",
+    ],
+    "pubchemCid": 24408,
+    "smiles": "BrBr",
+    "props": {
+      "molecularWeight": {
+        "value": 159.81,
+        "source": "measured",
+        "note": "PubChem",
+      },
+      "boilingPoint": {
+        "value": 58.8,
+        "source": "measured",
+        "note": "PubChem experimental (pug_view)",
+      },
+      "vaporPressure25": {
+        "value": 30520.755663211927,
+        "source": "estimated",
+        "note": "Clausius-Clapeyron + Trouton from PubChem boiling point",
+      },
+      "functionalGroups": [],
+      "redoxActive": false,
+    },
+    "sourceRefs": [
+      "PubChem CID 24408", "PubChem pug_view (experimental boiling point)",
+    ],
+  },
+  {
     "id": "gen-24526",
     "name": "molecular chlorine",
     "synonyms": [
@@ -2952,6 +3893,71 @@ export const GENERATED_COMPOUNDS: Chemical[] = [
     },
     "sourceRefs": [
       "PubChem CID 62835", "PubChem pug_view (experimental boiling point)", "odor: flavornet", "odor: goodscents",
+    ],
+  },
+  {
+    "id": "gen-89594",
+    "name": "3-[(2S)-1-methylpyrrolidin-2-yl]pyridine",
+    "synonyms": [
+      "nicotine",
+    ],
+    "pubchemCid": 89594,
+    "smiles": "CN1CCC[C@H]1C2=CN=CC=C2",
+    "props": {
+      "molecularWeight": {
+        "value": null,
+        "source": "unknown",
+      },
+      "boilingPoint": {
+        "value": 247,
+        "source": "measured",
+        "note": "PubChem experimental (pug_view)",
+      },
+      "vaporPressure25": {
+        "value": 38.27956963667605,
+        "source": "estimated",
+        "note": "Clausius-Clapeyron + Trouton from PubChem boiling point",
+      },
+      "functionalGroups": [
+        "aromatic", "amine",
+      ],
+      "redoxActive": true,
+    },
+    "sourceRefs": [
+      "PubChem CID 89594", "PubChem pug_view (experimental boiling point)",
+    ],
+  },
+  {
+    "id": "gen-145068",
+    "name": "nitric oxide",
+    "synonyms": [
+      "nitric oxide",
+    ],
+    "pubchemCid": 145068,
+    "smiles": "[N]=O",
+    "props": {
+      "molecularWeight": {
+        "value": 30.006,
+        "source": "measured",
+        "note": "PubChem",
+      },
+      "boilingPoint": {
+        "value": -151.7,
+        "source": "measured",
+        "note": "PubChem experimental (pug_view)",
+      },
+      "vaporPressure25": {
+        "value": 53708157.44504276,
+        "source": "estimated",
+        "note": "Clausius-Clapeyron + Trouton from PubChem boiling point",
+      },
+      "functionalGroups": [],
+      "redoxActive": true,
+      "oxidizing": true,
+      "gas": true,
+    },
+    "sourceRefs": [
+      "PubChem CID 145068", "PubChem pug_view (experimental boiling point)",
     ],
   },
   {
@@ -3291,6 +4297,106 @@ export const GENERATED_COMPOUNDS: Chemical[] = [
     },
     "sourceRefs": [
       "PubChem CID 1268142", "PubChem pug_view (experimental boiling point)", "odor: flavornet", "odor: goodscents", "odor: dravnieks_1985",
+    ],
+  },
+  {
+    "id": "gen-1548943",
+    "name": "(E)-N-[(4-hydroxy-3-methoxyphenyl)methyl]-8-methylnon-6-enamide",
+    "synonyms": [
+      "capsaicin",
+    ],
+    "pubchemCid": 1548943,
+    "smiles": "CC(C)/C=C/CCCCC(=O)NCC1=CC(=C(C=C1)O)OC",
+    "props": {
+      "molecularWeight": {
+        "value": 305.4,
+        "source": "measured",
+        "note": "PubChem",
+      },
+      "boilingPoint": {
+        "value": 220,
+        "source": "measured",
+        "note": "PubChem experimental (pug_view)",
+      },
+      "vaporPressure25": {
+        "value": 99.82685730983546,
+        "source": "estimated",
+        "note": "Clausius-Clapeyron + Trouton from PubChem boiling point",
+      },
+      "functionalGroups": [
+        "aromatic", "aldehyde", "phenol", "ether", "amine", "alkene",
+      ],
+      "redoxActive": true,
+      "odorDescriptor": "herbal, mild, warm",
+    },
+    "sourceRefs": [
+      "PubChem CID 1548943", "PubChem pug_view (experimental boiling point)", "odor: goodscents",
+    ],
+  },
+  {
+    "id": "gen-2723872",
+    "name": "(3S,4R,5R)-2-(hydroxymethyl)oxane-2,3,4,5-tetrol",
+    "synonyms": [
+      "fructose",
+    ],
+    "pubchemCid": 2723872,
+    "smiles": "C1[C@H]([C@H]([C@@H](C(O1)(CO)O)O)O)O",
+    "props": {
+      "molecularWeight": {
+        "value": 180.16,
+        "source": "measured",
+        "note": "PubChem",
+      },
+      "boilingPoint": {
+        "value": null,
+        "source": "unknown",
+      },
+      "vaporPressure25": {
+        "value": null,
+        "source": "unknown",
+      },
+      "functionalGroups": [
+        "alcohol", "ether",
+      ],
+      "redoxActive": true,
+    },
+    "sourceRefs": [
+      "PubChem CID 2723872",
+    ],
+  },
+  {
+    "id": "gen-3032552",
+    "name": "nitrogen dioxide",
+    "synonyms": [
+      "nitrogen dioxide",
+    ],
+    "pubchemCid": 3032552,
+    "smiles": "N(=O)[O]",
+    "props": {
+      "molecularWeight": {
+        "value": 46.006,
+        "source": "measured",
+        "note": "PubChem",
+      },
+      "boilingPoint": {
+        "value": 21.15,
+        "source": "measured",
+        "note": "PubChem experimental (pug_view)",
+      },
+      "vaporPressure25": {
+        "value": 116164.94928015463,
+        "source": "estimated",
+        "note": "Clausius-Clapeyron + Trouton from PubChem boiling point",
+      },
+      "functionalGroups": [
+        "amine",
+      ],
+      "redoxActive": true,
+      "oxidizing": true,
+      "gas": true,
+    },
+    "sourceRefs": [
+      "PubChem CID 3032552", "PubChem pug_view (experimental boiling point)",
     ],
   },
   {
