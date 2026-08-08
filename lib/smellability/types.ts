@@ -58,6 +58,10 @@ export interface Composite {
   synonyms: string[]
   constituents: CompositeConstituent[]
   notes?: string
+  /** True when this profile models reaction products of mixed substances, not a static blend. */
+  reaction?: boolean
+  /** Short safety warning to surface prominently (e.g. never-mix hazards). */
+  hazard?: string
   sourceRefs: string[]
 }
 
@@ -127,6 +131,10 @@ export interface FeasibilityVerdict {
   computedAt: string
   sensorCount: number
   notes: string[]
+  /** True when this profile models reaction products of mixed substances. */
+  reaction?: boolean
+  /** Short safety warning to surface prominently (e.g. never-mix hazards). */
+  hazard?: string
 }
 
 export interface SearchCandidate extends ResolvedEntity {

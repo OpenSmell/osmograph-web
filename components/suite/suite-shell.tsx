@@ -63,9 +63,9 @@ function Shell() {
             {sessions.length} session{sessions.length === 1 ? "" : "s"}
           </div>
           <div className="flex items-center gap-2">
-            <Button asChild size="sm" className="gap-1.5">
+            <Button asChild size="sm" className="gap-1.5" title="Desktop app: connect your E-Nose rig, record live sessions, and analyze offline">
               <a href={DESKTOP_APP_URL} target="_blank" rel="noreferrer">
-                <Download className="size-3.5" /> Desktop app
+                <Download className="size-3.5" /> Get the desktop app
               </a>
             </Button>
             <ThemeToggle />
@@ -96,9 +96,15 @@ function Shell() {
             )
           })}
           <div className="mt-auto flex flex-col gap-2 border-t border-border/60 pt-4">
-            <Button asChild variant="ghost" size="sm" className="w-full justify-start">
+            <Button asChild variant="ghost" size="sm" className="h-auto w-full justify-start gap-2 py-2">
               <a href={DESKTOP_APP_URL} target="_blank" rel="noreferrer">
-                <MonitorDown className="size-4" /> Get the desktop app
+                <MonitorDown className="size-4 shrink-0" />
+                <span className="flex flex-col items-start gap-0.5">
+                  <span className="text-sm font-medium">Get the desktop app</span>
+                  <span className="text-xs font-normal text-muted-foreground">
+                    Connect your E-Nose rig, record live, analyze offline
+                  </span>
+                </span>
               </a>
             </Button>
             <Button

@@ -86,7 +86,7 @@ describe("launch readiness", () => {
 
   it("redox direction is classified correctly for inorganics", () => {
     // Oxidizing gases respond on MOX (resistance rise) and must be green.
-    for (const id of ["gen-24823", "gen-24526"]) {
+    for (const id of ["gen-24823", "chlorine"]) {
       const c = COMPOUND_BY_ID.get(id)
       expect(c, id).toBeDefined()
       if (!c) continue
@@ -100,5 +100,25 @@ describe("launch readiness", () => {
     const co2 = COMPOUND_BY_ID.get("carbon-dioxide")
     expect(co2?.props.nonRedox).toBe(true)
     expect(runChemicalVerdict(co2!).verdict).toBe("red")
+  })
+
+  it("reaction composites carry reaction/hazard flags through the chain", () => {
+    const reaction = COMPOSITES.filter((c) => c.reaction)
+    expect(reaction.length).toBeGreaterThanOrEqual(4)
+    for (const c of reaction) {
+      const v = runCompositeVerdict(c)
+      expect(v.entityId).toBe(c.id)
+      expect(v.reaction).toBe(true)
+    }
+    const hazardous = COMPOSITES.filter((c) => c.hazard)
+    expect(hazardous.length).toBeGreaterThanOrEqual(3)
+    for (const c of hazardous) {
+      expect(c.reaction, c.id).toBe(true)
+      expect(runCompositeVerdict(c).hazard).toBe(c.hazard)
+    }
+    // The reaction pairs resolve from their everyday phrases.
+    for (const q of ["bleach and ammonia", "bleach and vinegar", "vinegar and baking soda", "lemon juice and baking soda"]) {
+      expect(searchSubstances(q, 1)[0]?.id, q).not.toBeUndefined()
+    }
   })
 })

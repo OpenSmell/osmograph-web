@@ -40,7 +40,8 @@ export function LibraryView({
         <div className="flex flex-col gap-1">
           <p className="text-sm font-medium">Your library is empty</p>
           <p className="text-xs text-muted-foreground">
-            Record with the desktop app, then import a recording to start building
+            Record with the desktop app — it connects directly to your E-Nose rig
+            for live, offline capture — then import a recording to start building
             your session library.
           </p>
         </div>

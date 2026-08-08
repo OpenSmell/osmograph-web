@@ -429,6 +429,8 @@ export function runCompositeVerdict(composite: Composite, opts: ChainOptions = {
     computedAt: new Date().toISOString(),
     sensorCount,
     notes,
+    reaction: composite.reaction,
+    hazard: composite.hazard,
   }
 }
 

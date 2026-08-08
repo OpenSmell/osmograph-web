@@ -1012,6 +1012,23 @@ export function SmellabilityView({
                 </Button>
               </div>
             </div>
+            {verdict.hazard && (
+              <div className="mt-4 flex items-start gap-2 rounded-lg border border-red-500/40 bg-red-500/10 px-3 py-2.5 text-xs text-red-500">
+                <AlertTriangle className="mt-0.5 size-4 shrink-0" />
+                <span className="flex-1">
+                  <span className="font-semibold">Safety:</span> {verdict.hazard}
+                </span>
+              </div>
+            )}
+            {verdict.reaction && !verdict.hazard && (
+              <div className="mt-4 flex items-start gap-2 rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2.5 text-xs text-amber-500">
+                <Info className="mt-0.5 size-4 shrink-0" />
+                <span className="flex-1">
+                  This profile models the <span className="font-semibold">reaction products</span> of mixed substances —
+                  not a static blend of the inputs.
+                </span>
+              </div>
+            )}
             {verdict.notes.length > 0 && (
               <div className="mt-4 flex flex-col gap-1.5 rounded-lg border border-border/40 bg-background/60 p-3">
                 {verdict.notes.map((n, i) => (
@@ -1218,6 +1235,12 @@ export function SmellabilityView({
                       <p>
                         Mixtures (foods, products) aggregate per-constituent grades weighted by abundance. Estimated
                         properties are flagged with a dot — we never fabricate missing data.
+                      </p>
+                      <p>
+                        Mixtures are assumed to blend additively. Chemical reactions between mixed ingredients are not
+                        modeled — known reactive pairs (bleach + ammonia, bleach + acid, peroxide + vinegar) are flagged
+                        with their own <span className="font-medium text-foreground">reaction-product profile</span> and a
+                        prominent safety warning instead.
                       </p>
                     </div>
                   )}

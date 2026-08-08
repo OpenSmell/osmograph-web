@@ -87,6 +87,11 @@ const MAPS: [string, string][] = [
   ["garlic powder", "garlic"],
   ["brewing", "beer"],
   ["electrical fire", "electrical-fire"],
+  ["bleach and ammonia", "bleach-ammonia"],
+  ["bleach and vinegar", "bleach-acid"],
+  ["hydrogen peroxide and vinegar", "peroxide-vinegar"],
+  ["vinegar and baking soda", "vinegar-baking-soda"],
+  ["lemon juice and baking soda", "lemon-baking-soda"],
 ]
 
 describe("everyday top-1 mappings", () => {
