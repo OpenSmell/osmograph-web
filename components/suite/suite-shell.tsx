@@ -111,6 +111,17 @@ function Shell() {
     setView(next)
   }
 
+  // Deep links from the scent-search site (or anywhere) can arrive as
+  // ?q=<name or SMILES> and jump straight to a detectability verdict.
+  React.useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const q = params.get("q")?.trim()
+    if (q) {
+      setVerdictPrefill(q)
+      setView("smellability")
+    }
+  }, [])
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur">
