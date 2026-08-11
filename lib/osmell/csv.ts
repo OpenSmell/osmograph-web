@@ -1,5 +1,4 @@
 import {
-  TIME_COLUMN_ALIASES,
   DEFAULT_SYNTHETIC_RATE_HZ,
   CONTEXT_COLUMN_HINTS,
   type ParsedSample,
@@ -25,7 +24,56 @@ export interface CsvParseResult {
 
 const MOX_CHANNEL_IDS = ["VOC", "Alcohol", "LPG", "CO", "NO2", "C2H5OH"]
 
-function parseRow(raw: string): string[] {
+/** Detected time column with its assumed unit. */
+interface TimeColumnInfo {
+  name: string
+  unit: "ms" | "s"
+}
+
+/**
+ * Match a time column by name, tolerating whitespace, parentheses and common
+ * unit suffixes. Returns `null` when no column looks like a time axis.
+ */
+function detectTimeColumnInfo(header: string[]): TimeColumnInfo | null {
+  for (const raw of header) {
+    const n = raw
+      .toLowerCase()
+      .trim()
+      .replace(/[\(\[\]\)]/g, "")
+      .replace(/\s+/g, "")
+    if (/^(timestamp|elapsed)(_ms)?$/.test(n)) return { name: raw, unit: "ms" }
+    if (/^(time)(_ms)?$/.test(n)) return { name: raw, unit: "ms" }
+    if (/^(time)(_s|s)$/.test(n)) return { name: raw, unit: "s" }
+    if (/^synthetic_index$/.test(n)) return { name: raw, unit: "ms" }
+  }
+  return null
+}
+
+export function detectTimeColumn(header: string[]): string | null {
+  return detectTimeColumnInfo(header)?.name ?? null
+}
+
+export function isContextColumn(name: string): boolean {
+  const n = name.toLowerCase()
+  return CONTEXT_COLUMN_HINTS.some((hint) => n.includes(hint))
+}
+
+function detectDelimiter(sampleLine: string): string {
+  const candidates = [",", ";", "\t", "|"]
+  let best = ","
+  let bestCount = -1
+  for (const c of candidates) {
+    const re = c === "\t" ? /\t/g : new RegExp(`\\${c}`, "g")
+    const count = (sampleLine.match(re) ?? []).length
+    if (count > bestCount) {
+      bestCount = count
+      best = c
+    }
+  }
+  return best
+}
+
+function parseRow(raw: string, delim: string): string[] {
   const cells: string[] = []
   let current = ""
   let inQuotes = false
@@ -38,7 +86,7 @@ function parseRow(raw: string): string[] {
       } else {
         inQuotes = !inQuotes
       }
-    } else if (c === "," && !inQuotes) {
+    } else if (c === delim && !inQuotes) {
       cells.push(current)
       current = ""
     } else {
@@ -49,18 +97,36 @@ function parseRow(raw: string): string[] {
   return cells
 }
 
-export function detectTimeColumn(header: string[]): string | null {
-  const lowered = header.map((h) => h.toLowerCase().trim())
-  for (const alias of TIME_COLUMN_ALIASES) {
-    const idx = lowered.indexOf(alias)
-    if (idx >= 0) return header[idx]
-  }
-  return null
-}
+/**
+ * Coerce a raw time cell to milliseconds. Handles plain numbers (ms), epoch
+ * seconds, ISO/datetime strings and HH:MM:SS[.mmm] stopwatch-style values.
+ */
+function parseTimeValue(raw: string, unit: "ms" | "s"): number | null {
+  const s = raw.trim()
+  if (s === "") return null
 
-export function isContextColumn(name: string): boolean {
-  const n = name.toLowerCase()
-  return CONTEXT_COLUMN_HINTS.some((hint) => n.includes(hint))
+  const n = Number(s)
+  if (Number.isFinite(n)) {
+    if (unit === "s") return n * 1000
+    return n
+  }
+
+  const iso = Date.parse(s)
+  if (Number.isFinite(iso)) return iso
+
+  const clock = s.match(/^(\d{1,3}):(\d{2}):(\d{2})(?:[.,](\d{1,6}))?$/)
+  if (clock) {
+    const h = Number(clock[1])
+    const min = Number(clock[2])
+    const sec = Number(clock[3])
+    if (min < 60 && sec < 60) {
+      const fracRaw = clock[4] ?? ""
+      const frac = fracRaw.length > 0 ? Number(fracRaw) / 10 ** fracRaw.length : 0
+      return (h * 3600 + min * 60 + sec) * 1000 + frac * 1000
+    }
+  }
+
+  return null
 }
 
 export function parseCsv(text: string): CsvParseResult {
@@ -77,14 +143,23 @@ export function parseCsv(text: string): CsvParseResult {
     throw new Error("The CSV has a header but no data rows.")
   }
 
-  const header = parseRow(rows[0]).map((h) => h.trim())
+  const delim = detectDelimiter(rows[1])
+  if (delim !== ",") {
+    warnings.push(
+      `Detected "${delim}"-delimited values; parsed accordingly. Convert to comma-delimited CSV for widest tool compatibility.`,
+    )
+  }
+
+  const header = parseRow(rows[0], delim).map((h) => h.trim())
   if (header.length === 0) {
     throw new Error("The CSV has no columns.")
   }
 
-  const timeCol = detectTimeColumn(header)
-  const timeSource: TimeSource = timeCol !== null ? "column" : "synthetic"
-  const syntheticRateHz = timeSource === "synthetic" ? DEFAULT_SYNTHETIC_RATE_HZ : 0
+  const timeInfo = detectTimeColumnInfo(header)
+  let timeCol: string | null = timeInfo?.name ?? null
+  const timeUnit: "ms" | "s" = timeInfo?.unit ?? "ms"
+  let timeSource: TimeSource = timeCol !== null ? "column" : "synthetic"
+  let syntheticRateHz = timeSource === "synthetic" ? DEFAULT_SYNTHETIC_RATE_HZ : 0
   if (timeSource === "synthetic") {
     warnings.push(
       "No time column found (expected timestamp_ms or elapsed_ms); synthesized 10 Hz timing from row index. Add a timestamp column for accurate time-based features.",
@@ -105,7 +180,7 @@ export function parseCsv(text: string): CsvParseResult {
   const numericCount: Record<string, number> = {}
   for (const c of sensorCandidates) numericCount[c] = 0
   for (let r = 1; r < rows.length; r++) {
-    const cells = parseRow(rows[r])
+    const cells = parseRow(rows[r], delim)
     for (const c of sensorCandidates) {
       const idx = header.indexOf(c)
       if (idx < cells.length && safeFloat(cells[idx]) !== null) numericCount[c]++
@@ -127,13 +202,35 @@ export function parseCsv(text: string): CsvParseResult {
   let nonFinite = 0
   let unsorted = false
 
+  // A detected-but-unreadable time column must not reject the whole file.
+  // Pre-scan: if no time cell parses, drop back to synthetic timing so every
+  // data row is still adopted (with a warning teaching the expected format).
+  if (timeSource === "column") {
+    let parsed = 0
+    let checked = 0
+    for (let r = 1; r < rows.length && checked < 25; r++) {
+      const cells = parseRow(rows[r], delim)
+      if (cells.length !== header.length) continue
+      checked++
+      if (parseTimeValue(cells[timeIdx], timeUnit) !== null) parsed++
+    }
+    if (parsed === 0) {
+      timeSource = "synthetic"
+      syntheticRateHz = DEFAULT_SYNTHETIC_RATE_HZ
+      warnings.push(
+        `Column "${timeCol}" was not readable as time (expected ms, epoch seconds, ISO datetime or HH:MM:SS); synthesized 10 Hz timing instead.`,
+      )
+      timeCol = null
+    }
+  }
+
   for (let r = 1; r < rows.length; r++) {
-    const cells = parseRow(rows[r])
+    const cells = parseRow(rows[r], delim)
     if (cells.length !== header.length) continue
 
     let rawTime: number
     if (timeSource === "column") {
-      const t = safeFloat(cells[timeIdx])
+      const t = parseTimeValue(cells[timeIdx], timeUnit)
       if (t === null) {
         nonFinite++
         continue
@@ -165,6 +262,16 @@ export function parseCsv(text: string): CsvParseResult {
     }
 
     samples.push({ time: rawTime, values })
+  }
+
+  // Numeric time that clearly sits in epoch-seconds range (≈2001–2036) is scaled to ms.
+  if (timeSource === "column" && samples.length > 0) {
+    const sortedTimes = samples.map((s) => s.time).sort((a, b) => a - b)
+    const medianTime = sortedTimes[Math.floor(sortedTimes.length / 2)]
+    if (medianTime >= 1_200_000_000 && medianTime <= 4_000_000_000) {
+      for (const s of samples) s.time = s.time * 1000
+      warnings.push("Time column read as epoch seconds and converted to milliseconds.")
+    }
   }
 
   for (let i = 1; i < samples.length; i++) {
