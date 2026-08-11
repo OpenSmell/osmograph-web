@@ -12,7 +12,7 @@ export function channelSamples(
   const out: number[] = []
   for (const s of samples) {
     const v = s.values[channelId]
-    if (v !== undefined) out.push(v)
+    if (v !== undefined && v !== null) out.push(v)
   }
   return out
 }

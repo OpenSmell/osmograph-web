@@ -3,7 +3,7 @@ import type {
   OsmellFile,
   SensorType,
 } from "./types"
-import { DEFAULT_R0_SAMPLES } from "./types"
+import { DEFAULT_R0_SAMPLES, DEFAULT_SYNTHETIC_RATE_HZ } from "./types"
 import { baselineForChannel, channelStats, normalizedSeries, std } from "./normalize"
 import { parseCsv } from "./csv"
 
@@ -178,7 +178,7 @@ export async function inferFromCsv(
   const parsed = parseCsv(text)
   return {
     sensorType: guessSensorType(parsed.channelIds),
-    guessSamplingRateHz: parsed.guessSamplingRateHz,
+    guessSamplingRateHz: parsed.guessSamplingRateHz || DEFAULT_SYNTHETIC_RATE_HZ,
     channelIds: parsed.channelIds,
   }
 }

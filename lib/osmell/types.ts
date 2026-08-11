@@ -1,7 +1,31 @@
 export const OSMELL_FORMAT_VERSION = "1.0.0"
 
 export const TIME_COLUMNS = ["timestamp_ms", "elapsed_ms"] as const
-export type TimeColumn = (typeof TIME_COLUMNS)[number]
+/** Broader accepted time-column names for tolerant CSV import (matched case-insensitively). */
+export const TIME_COLUMN_ALIASES = [
+  "timestamp_ms",
+  "elapsed_ms",
+  "timestamp",
+  "elapsed",
+  "time_ms",
+  "time_s",
+  "time",
+  "synthetic_index",
+] as const
+/** Timing assumed for CSVs with no time column (recorded as `timeSource: "synthetic"`). */
+export const DEFAULT_SYNTHETIC_RATE_HZ = 10.0
+/** Environmental columns preserved as metadata, never scored as sensor channels. */
+export const CONTEXT_COLUMN_HINTS = [
+  "temperature",
+  "pressure",
+  "humidity",
+  "gas_res",
+  "resistance",
+  "altitude",
+] as const
+
+export type TimeColumn = (typeof TIME_COLUMNS)[number] | (typeof TIME_COLUMN_ALIASES)[number]
+export type TimeSource = "column" | "synthetic"
 
 export const SENSOR_TYPES = ["mox", "miris", "electrochemical", "other", "unknown"] as const
 export type SensorType = (typeof SENSOR_TYPES)[number]
@@ -40,7 +64,7 @@ export interface SensorDescriptor {
   samplingRateHz?: number
   adcBits?: number
   adcMax?: number
-  timeColumn: TimeColumn
+  timeColumn: string
   calibration?: Record<string, CalibrationDescriptor>
 }
 
@@ -59,6 +83,18 @@ export interface BaselineDescriptor {
   r0Samples?: number
 }
 
+export interface IngestProvenance {
+  sourceFile?: string
+  timeSource?: TimeSource
+  syntheticRateHz?: number | null
+  timeColumn?: string | null
+  contextColumns?: string[]
+  unknownColumns?: string[]
+  skippedColumns?: string[]
+  warnings?: string[]
+  context?: Record<string, (number | null)[]>
+}
+
 export interface OsmellManifest {
   osmell: {
     formatVersion: string
@@ -70,6 +106,10 @@ export interface OsmellManifest {
   software?: {
     recorder?: string
     importer?: string
+  }
+  extra?: {
+    ingest?: IngestProvenance
+    [key: string]: unknown
   }
   [key: string]: unknown
 }
@@ -90,7 +130,7 @@ export interface OsmellFile {
 
 export interface ParsedSample {
   time: number
-  values: Record<string, number>
+  values: Record<string, number | null>
 }
 
 export interface ChannelStats {
