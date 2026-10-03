@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Osmograph &mdash; Documentation</title>
+<style>
+:root { --bg: #0a0a0a; --fg: #f0f0f0; --muted: #a0a0a0; --dim: #606060; --card: #141414; --border: #2a2a2a; --accent: #4a9eff; --accent2: #6ab4ff; --success: #34d399; --warn: #fbbf24; --err: #ef4444; --sidebar: #0d0d0d; --hover: #1e1e1e; }
+.light { --bg: #fafafa; --fg: #1a1a1a; --muted: #6b6b6b; --dim: #a0a0a0; --card: #ffffff; --border: #d4d4d4; --accent: #2563eb; --accent2: #3b82f6; --success: #10b981; --warn: #f59e0b; --err: #dc2626; --sidebar: #f0f0f0; --hover: #e8e8e8; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--fg); line-height: 1.6; font-size: 15px; display: flex; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.sidebar { position: fixed; top: 0; left: 0; width: 260px; height: 100vh; background: var(--sidebar); border-right: 1px solid var(--border); overflow-y: auto; z-index: 10; }
+.sidebar .logo { padding: 20px 16px 12px; border-bottom: 1px solid var(--border); }
+.sidebar .logo h1 { font-size: 18px; font-weight: 700; color: var(--accent); }
+.sidebar .logo p { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.sidebar nav { padding: 8px 0; }
+.sidebar nav a { display: block; padding: 6px 16px; font-size: 13px; color: var(--muted); border-left: 2px solid transparent; transition: all 0.15s; }
+.sidebar nav a:hover { background: var(--hover); color: var(--fg); text-decoration: none; }
+.sidebar nav a.active { color: var(--accent); border-left-color: var(--accent); background: var(--hover); }
+.sidebar nav .section { padding: 12px 16px 4px; font-size: 10px; font-weight: 600; color: var(--dim); text-transform: uppercase; letter-spacing: 0.05em; }
+.main { margin-left: 260px; flex: 1; min-height: 100vh; }
+.topbar { position: sticky; top: 0; background: var(--bg); border-bottom: 1px solid var(--border); padding: 12px 32px; display: flex; align-items: center; justify-content: space-between; z-index: 5; }
+.topbar .path { font-size: 13px; color: var(--muted); }
+.topbar .controls { display: flex; gap: 8px; align-items: center; }
+.topbar button { background: var(--card); color: var(--fg); border: 1px solid var(--border); padding: 4px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; }
+.topbar button:hover { border-color: var(--accent); }
+.content { padding: 32px 40px 80px; max-width: 900px; }
+.content h2 { font-size: 28px; font-weight: 700; margin: 0 0 16px; color: var(--fg); }
+.content h3 { font-size: 20px; font-weight: 600; margin: 32px 0 12px; color: var(--fg); }
+.content h4 { font-size: 16px; font-weight: 600; margin: 24px 0 8px; color: var(--fg); }
+.content p { margin: 0 0 12px; color: var(--muted); }
+.content ul, .content ol { margin: 0 0 16px 24px; color: var(--muted); }
+.content li { margin: 4px 0; }
+.content code { background: var(--card); padding: 2px 6px; border-radius: 3px; font-size: 13px; border: 1px solid var(--border); }
+.content pre { background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 16px; overflow-x: auto; margin: 0 0 16px; font-size: 13px; }
+.content pre code { background: none; border: none; padding: 0; }
+.content .card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin: 0 0 16px; }
+.content .card h4 { margin-top: 0; }
+.content .tag { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 3px; margin-right: 4px; }
+.content .tag.feature { background: rgba(74,158,255,0.15); color: var(--accent); }
+.content .tag.new { background: rgba(52,211,153,0.15); color: var(--success); }
+.content .tag.info { background: rgba(251,191,36,0.15); color: var(--warn); }
+.content .key { display: inline-block; background: var(--card); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; font-size: 11px; font-family: monospace; }
+.content table { width: 100%; border-collapse: collapse; margin: 0 0 16px; font-size: 13px; }
+.content th, .content td { padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+.content th { font-weight: 600; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.03em; }
+.content td { color: var(--muted); }
+.content tr:hover td { background: var(--hover); }
+.content blockquote { border-left: 3px solid var(--accent); padding: 12px 16px; margin: 0 0 16px; background: var(--card); border-radius: 0 6px 6px 0; }
+.content blockquote p { margin: 0; }
+.content img { max-width: 100%; border-radius: 6px; border: 1px solid var(--border); margin: 8px 0; }
+.content .steps { counter-reset: step; }
+.content .steps li { counter-increment: step; }
+.content .steps li::marker { content: "Step " counter(step) ": "; font-weight: 600; color: var(--accent); }
+#search { background: var(--card); border: 1px solid var(--border); border-radius: 4px; padding: 4px 10px; color: var(--fg); font-size: 12px; width: 160px; outline: none; }
+#search:focus { border-color: var(--accent); }
+@media (max-width: 768px) { .sidebar { width: 100%; height: auto; position: relative; } .main { margin-left: 0; } .content { padding: 20px; } }
+</style>
+</head>
+<body>
+
+<aside class="sidebar" id="sidebar">
+  <div class="logo">
+    <h1>Osmograph</h1>
+    <p>v2.0 &middot; Digital Olfaction Platform</p>
+  </div>
+  <nav id="nav">
+    <div class="section">Getting Started</div>
+    <a href="#intro" class="active">Introduction</a>
+    <a href="#quickstart">Quick Start</a>
+    <a href="#hardware">Hardware Setup</a>
+    <a href="#connect">Connecting</a>
+    <div class="section">Interface</div>
+    <a href="#dashboard">Dashboard</a>
+    <a href="#traces">Live Traces</a>
+    <a href="#fingerprint">Fingerprint</a>
+    <a href="#health">Device Health</a>
+    <a href="#prediction">Prediction Panel</a>
+    <a href="#competition">Competition Grid</a>
+    <a href="#demo">Demo Mode</a>
+    <a href="#recordings">Recordings</a>
+    <a href="#training">Classifier Training</a>
+    <a href="#system">System Tab</a>
+    <div class="section">SDK &amp; Features</div>
+    <a href="#features">187 Feature Reference</a>
+    <a href="#sdk">Python SDK API</a>
+    <a href="#protocol">Recording Protocol</a>
+    <div class="section">Reference</div>
+    <a href="#menu">Menu Reference</a>
+    <a href="#shortcuts">Keyboard Shortcuts</a>
+    <a href="#troubleshooting">Troubleshooting</a>
+    <a href="#faq">FAQ</a>
+  </nav>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div class="path" id="path">Osmograph Docs</div>
+    <div class="controls">
+      <input type="text" id="search" placeholder="Search...">
+      <button id="themeToggle">Toggle Theme</button>
+    </div>
+  </div>
+
+  <div class="content" id="content">
+
+<!-- ==================== INTRODUCTION ==================== -->
+<section id="intro">
+<h2>Introduction</h2>
+<p>Osmograph is a desktop application for <strong>digital olfaction</strong> &mdash; the measurement and identification of odours using an array of Metal Oxide (MOX) gas sensors. It connects to an ESP32-based electronic nose, records sensor responses, extracts <strong>187-dimensional feature vectors</strong>, and classifies substances in real time.</p>
+
+<div class="card">
+<h4>What Problem Does This Solve?</h4>
+<p>Traditional gas sensing is device-dependent: a reading from one sensor board cannot be compared to another. Osmograph solves this through the <strong>Rs/R0 normalization pipeline</strong>, which mathematically cancels supply voltage and load resistor variations, producing device-agnostic feature vectors. This means:</p>
+<ul>
+  <li>Models trained on one device work on another (same sensor model)</li>
+  <li>Features are physically interpretable across rigs</li>
+  <li>You can share and compare datasets across labs</li>
+</ul>
+</div>
+
+<div class="card">
+<h4>Five Feature Dimensions</h4>
+<table>
+  <tr><th>Dimension</th><th>Question</th><th>Example Features</th></tr>
+  <tr><td>Device-Agnostic</td><td>What substance?</td><td>Relative amplitude, rise time, AUC</td></tr>
+  <tr><td>Absolute</td><td>What concentration?</td><td>Raw resistance, voltage, calibrated concentration</td></tr>
+  <tr><td>Temporal</td><td>How fast?</td><td>Transient response, oscillation frequency</td></tr>
+  <tr><td>Health</td><td>Is the sensor working?</td><td>Drift rate, sensitivity decay, noise floor</td></tr>
+  <tr><td>Hardware</td><td>Which device?</td><td>Circuit response, thermal profile, ADC noise</td></tr>
+</table>
+</div>
+</section>
+
+<!-- ==================== QUICK START ==================== -->
+<section id="quickstart">
+<h2>Quick Start</h2>
+<pre><code># Install dependencies
+pip install -r requirements.txt
+
+# Run Osmograph
+python -m Osmograph
+
+# Or from the repo root:
+python run_osmograph.py</code></pre>
+
+<h3>What You'll Need</h3>
+<ul>
+  <li>An ESP32 development board</li>
+  <li>1&ndash;6 MQ-series gas sensors (MQ-135, MQ-3, MQ-6, MQ-7, MQ-4, MQ-8)</li>
+  <li>USB cable for flashing and serial connection</li>
+  <li>Breadboard and wiring (see <a href="#hardware">Hardware Setup</a>)</li>
+</ul>
+
+<h3>First Launch</h3>
+<ol class="steps">
+  <li>Connect your ESP32 via USB</li>
+  <li>Click <strong>Detect Board</strong> in the toolbar</li>
+  <li>Select your sensor preset</li>
+  <li>Click <strong>Flash Firmware</strong> (one-time)</li>
+  <li>Click <strong>Connect</strong> to start receiving data</li>
+</ol>
+<p>The dashboard will show live sensor traces. Allow 24 hours of <strong>burn-in</strong> for new MQ sensors to stabilise.</p>
+</section>
+
+<!-- ==================== HARDWARE ==================== -->
+<section id="hardware">
+<h2>Hardware Setup</h2>
+<h3>Wiring</h3>
+<p>Each MQ sensor has 4 pins: <strong>V<sub>CC</sub></strong> (5V), <strong>GND</strong>, <strong>DO</strong> (digital out &mdash; not used), and <strong>AO</strong> (analog out). Connect AO to an ESP32 ADC pin, V<sub>CC</sub> to 5V, and GND to common ground.</p>
+<p>A 1k&Omega; load resistor (R<sub>L</sub>) is typically built into the sensor module. If not, add one between AO and GND.</p>
+
+<h3>Default Pin Mapping (6-sensor)</h3>
+<table>
+  <tr><th>Sensor</th><th>ESP32 Pin</th><th>ADC Channel</th></tr>
+  <tr><td>MQ-135</td><td>GPIO 36</td><td>ADC1_CH0</td></tr>
+  <tr><td>MQ-3</td><td>GPIO 39</td><td>ADC1_CH3</td></tr>
+  <tr><td>MQ-6</td><td>GPIO 34</td><td>ADC1_CH6</td></tr>
+  <tr><td>MQ-7</td><td>GPIO 35</td><td>ADC1_CH7</td></tr>
+  <tr><td>MQ-4</td><td>GPIO 32</td><td>ADC1_CH4</td></tr>
+  <tr><td>MQ-8</td><td>GPIO 33</td><td>ADC1_CH5</td></tr>
+</table>
+<p>Use the <strong>Pin Mapper</strong> dialog (Tools menu) to customise pins and export a PlatformIO sketch.</p>
+
+<h3>Presets</h3>
+<p>The app ships with presets for 2&ndash;6 sensors. Select the preset matching your hardware when flashing. Custom presets can be added to <code>sensor/presets.py</code>.</p>
+</section>
+
+<!-- ==================== CONNECTING ==================== -->
+<section id="connect">
+<h2>Connecting</h2>
+<h3>USB Serial</h3>
+<ol>
+  <li>Plug in your ESP32</li>
+  <li>Click <strong>Detect Board</strong> &mdash; it auto-detects known ESP32 boards</li>
+  <li>Select the port from the dropdown</li>
+  <li>Click <strong>Connect</strong></li>
+</ol>
+
+<h3>WiFi</h3>
+<p>The ESP32 firmware also creates a WiFi access point (SSID: <code>OSMOGRAPH-XXXX</code>).</p>
+<ol>
+  <li>Switch mode to <strong>WiFi</strong> in the toolbar</li>
+  <li>Click <strong>Discover WiFi</strong> (uses mDNS) or enter the IP</li>
+  <li>Click <strong>Connect</strong></li>
+</ol>
+
+<h3>Data Format</h3>
+<p>The device sends lines of the format: <code>OSM,&lt;adc0&gt;,&lt;adc1&gt;,...</code> at ~10 Hz over serial or TCP (port 8080).</p>
+</section>
+
+<!-- ==================== DASHBOARD ==================== -->
+<section id="dashboard">
+<h2>Dashboard</h2>
+<p>The Dashboard is the main workspace (first tab). It is divided into two panels:</p>
+<ul>
+  <li><strong>Left (main)</strong>: Live sensor trace graph with a collapsible fingerprint radar below</li>
+  <li><strong>Right panel</strong>: Signal quality, device health, substance prediction, and competition grid</li>
+</ul>
+
+<h3>Toolbar Controls</h3>
+<ul>
+  <li><strong>FP</strong> button: toggle fingerprint visibility</li>
+  <li><strong>Reset</strong>: clear all traces, predictions, and quality data</li>
+  <li><strong>Pause/Resume</strong>: freeze the live trace display</li>
+</ul>
+
+<p>The signal quality indicator shows a compact dot with status (Warming Up / Ready / Recording). Per-sensor stability is shown as coloured dots (green/yellow/red) on the right edge of the trace graph. The device health widget shows per-channel noise and drift metrics once enough samples are collected.</p>
+
+<h3>Tab Layout</h3>
+<p>Osmograph organises its interface into <strong>3 main tabs</strong>, each with sub-tabs for secondary functions:</p>
+<ul>
+  <li><strong>Dashboard</strong> — live sensor monitoring (this view)</li>
+  <li><strong>Recordings</strong> — Browse (import/manage), Train (classifier training), Adapter (lightweight training)</li>
+  <li><strong>System</strong> — Settings (connection, classifier config), Burn-In, Plugins</li>
+</ul>
+<p>This reduces toolbar clutter and groups related functionality together.</p>
+</section>
+
+<!-- ==================== TRACES ==================== -->
+<section id="traces">
+<h2>Live Traces</h2>
+<p>The trace graph displays real-time sensor readings with 6 colour-coded lines. Each sensor has a dedicated colour:</p>
+<table>
+  <tr><th>Sensor</th><th>Colour</th></tr>
+  <tr><td>MQ-135</td><td style="color:#00ffff">Cyan</td></tr>
+  <tr><td>MQ-3</td><td style="color:#ff00ff">Magenta</td></tr>
+  <tr><td>MQ-6</td><td style="color:#adff2f">Lime</td></tr>
+  <tr><td>MQ-7</td><td style="color:#ff6347">Tomato</td></tr>
+  <tr><td>MQ-4</td><td style="color:#ffd700">Gold</td></tr>
+  <tr><td>MQ-8</td><td style="color:#00ced1">Turquoise</td></tr>
+</table>
+<p>The Y-axis shows <strong>Rs/R0</strong> (normalised resistance). A response is a downward or upward deflection depending on sensor type (n-type vs p-type).</p>
+<p>A column of small coloured dots on the right edge shows per-sensor <strong>signal quality</strong>:</p>
+<ul>
+  <li><span style="color:#34d399">Green</span> = stable (&gt;80% stability)</li>
+  <li><span style="color:#fbbf24">Yellow</span> = moderate (50&ndash;80%)</li>
+  <li><span style="color:#ef4444">Red</span> = unstable (&lt;50%)</li>
+</ul>
+</section>
+
+<!-- ==================== FINGERPRINT ==================== -->
+<section id="fingerprint">
+<h2>Fingerprint</h2>
+<p>The radar chart below the traces shows a <strong>fingerprint</strong> &mdash; a compact visual summary of the current sensor response. Toggle visibility with the <strong>FP</strong> button in the dashboard toolbar.</p>
+
+<h3>Dual Modes</h3>
+<p>Click the <strong>Sensor / Feature</strong> toggle button on the fingerprint widget to switch between:</p>
+<ul>
+  <li><strong>Sensor mode</strong> (default): 6-axis radar showing each MQ sensor's normalised response amplitude. This is the raw "who's responding" view.</li>
+  <li><strong>Feature mode</strong>: 8-axis radar showing derived features: Amplitude, Rise Time, Decay Time, AUC, Endpoint, Saturation, Selectivity, and Channel Activity.</li>
+</ul>
+
+<h3>Export</h3>
+<p>Export the full 187-dimensional feature vector via <strong>File &rarr; Export Fingerprint</strong> (Ctrl+E). Supports JSON (with metadata) and CSV formats.</p>
+</section>
+
+<!-- ==================== HEALTH ==================== -->
+<section id="health">
+<h2>Device Health</h2>
+<p>The device health widget appears in the Dashboard's right panel once enough samples (&gt;20) are collected. It shows per-channel health metrics for each sensor:</p>
+<ul>
+  <li><strong>Coloured dot</strong>: <span style="color:#34d399">Green</span> = stable (noise &lt;0.5), <span style="color:#fbbf24">Yellow</span> = moderate, <span style="color:#ef4444">Red</span> = noisy/unstable</li>
+  <li><strong>Status label</strong>: "OK", "~" (marginal), or "!" (poor)</li>
+</ul>
+<p>The widget auto-hides when no data is available. Health metrics (noise floor, drift rate, stability) are computed from the most recent 100 samples in real time.</p>
+</section>
+
+<!-- ==================== PREDICTION ==================== -->
+<section id="prediction">
+<h2>Prediction Panel</h2>
+<p>The prediction panel (right side, below signal quality) shows the <strong>substance identification</strong> result:</p>
+<ul>
+  <li><strong>Substance name</strong> &mdash; the predicted class label</li>
+  <li><strong>Confidence score</strong> &mdash; 0.0 to 1.0, shown numerically and as a progress bar</li>
+  <li><strong>Warning</strong> &mdash; shown if confidence is low or the sample is out of distribution</li>
+</ul>
+<p>When the classifier is confident (&gt;70%) for 10 consecutive predictions, the prediction <strong>locks</strong> (shown with a border). Below 50%, the sample is flagged as <strong>Unknown</strong> after 20 low-confidence predictions.</p>
+</section>
+
+<!-- ==================== DEMO ==================== -->
+<section id="demo">
+<h2>Demo Mode</h2>
+<p>Osmograph includes a <strong>Demo mode</strong> that generates synthetic sensor data — no hardware required. This is useful for:</p>
+<ul>
+  <li>Testing the UI and layout without connecting a board</li>
+  <li>Evaluating classifier behaviour with simulated inputs</li>
+  <li>Demonstrations and presentations</li>
+  <li>Verifying theme toggle and layout responsiveness</li>
+</ul>
+<h3>How to Use</h3>
+<ol>
+  <li>Click the <strong>Demo</strong> button in the toolbar (next to Connect)</li>
+  <li>The button turns yellow and shows "Stop Demo"</li>
+  <li>Synthetic sine-wave data appears in the trace graph</li>
+  <li>Click "Stop Demo" to end the simulation</li>
+</ol>
+<p>Demo mode uses six sinusoidal signals with added Gaussian noise to simulate sensor responses. If a classifier is loaded, predictions run against the synthetic data in real time.</p>
+</section>
+
+<!-- ==================== COMPETITION ==================== -->
+<section id="competition">
+<h2>Competition Grid</h2>
+<p>The competition grid shows <strong>all class probabilities</strong> simultaneously as animated vertical bars. Each bar represents one substance class:</p>
+<ul>
+  <li>Bar height = probability (0&ndash;100%)</li>
+  <li>Bar colour = class-specific colour</li>
+  <li>Percentage label above each bar</li>
+  <li>Class name rotated below</li>
+</ul>
+<p>When locked, a dashed accent border appears around the grid. The grid updates at 33ms intervals with smooth interpolation.</p>
+</section>
+
+<!-- ==================== RECORDINGS ==================== -->
+<section id="recordings">
+<h2>Recordings Tab</h2>
+<p>The Recordings tab is the central hub for managing your data. It has three sub-tabs: <strong>Browse</strong>, <strong>Train</strong>, and <strong>Adapter</strong>.</p>
+
+<h3>Browse</h3>
+<p>The Browse sub-tab lists all recorded sessions. Each recording is stored as a CSV file with a corresponding metadata entry.</p>
+<ul>
+  <li><strong>Import CSV</strong>: import an external CSV recording (useful for analysing data from other sources or sharing sessions between rigs)</li>
+  <li><strong>Refresh</strong>: reload the session list from disk</li>
+  <li><strong>Filter</strong>: filter by substance label</li>
+  <li><strong>Process</strong>: run OpenSmell feature extraction and classification on a selected recording</li>
+  <li><strong>Export FP</strong>: export the full 187-dimensional fingerprint as JSON or CSV</li>
+  <li><strong>Delete</strong>: remove a recording permanently</li>
+</ul>
+
+<h3>Auto-Processing</h3>
+<p>When a new recording completes, Osmograph automatically processes it through the OpenSmell SDK, extracting features and updating the dashboard fingerprint, prediction, and sensor response display.</p>
+
+<h3>Train</h3>
+<p>See <a href="#training">Classifier Training</a> for details on training real-time classifiers from your recordings.</p>
+
+<h3>Adapter</h3>
+<p>See <a href="#training">Adapter Wizard</a> for lightweight adapter training.</p>
+</section>
+
+<!-- ==================== CLASSIFIER TRAINING ==================== -->
+<section id="training">
+<h2>Classifier Training</h2>
+<p>The Train sub-tab (under <strong>Recordings &rarr; Train</strong>) lets you train a real-time substance classifier from your recordings.</p>
+
+<h3>Workflow</h3>
+<ol class="steps">
+  <li>Record 3&ndash;5 samples of each substance (10&ndash;60 seconds each)</li>
+  <li>Go to <strong>Recordings &rarr; Train</strong> &mdash; your recordings are loaded automatically</li>
+  <li>Assign labels to each recording</li>
+  <li>Choose a classifier model (RandomForest or LogisticRegression)</li>
+  <li>Click <strong>Train Classifier</strong></li>
+  <li>The trained model appears in the toolbar dropdown &mdash; select it for real-time prediction</li>
+</ol>
+
+<h3>Models</h3>
+<table>
+  <tr><th>Model</th><th>Best For</th></tr>
+  <tr><td>RandomForest</td><td>General purpose, handles non-linear separations, small datasets (5&ndash;50 samples per class)</td></tr>
+  <tr><td>LogisticRegression</td><td>Fast, interpretable, works well when classes are linearly separable in feature space</td></tr>
+</table>
+
+<p>Trained models are saved as <code>.pkl</code> files in the <code>classifiers/</code> directory.</p>
+</section>
+
+<!-- ==================== SYSTEM ==================== -->
+<section id="system">
+<h2>System Tab</h2>
+<p>The System tab (third main tab) groups configuration and maintenance tools into three sub-tabs: <strong>Settings</strong>, <strong>Burn-In</strong>, and <strong>Plugins</strong>.</p>
+
+<h3>Settings</h3>
+<p><span class="tag info">System &rarr; Settings</span> Configure serial baud rate, classifier parameters, and data storage directory.</p>
+<ul>
+  <li><strong>Baud rate</strong>: 9600 to 921600 (default 115200)</li>
+  <li><strong>Window size</strong>: sliding window for feature extraction (20&ndash;500 samples). Lower = faster updates, higher = more stable predictions.</li>
+  <li><strong>Confidence threshold</strong>: below this value, predictions show as "Unknown" (0.0&ndash;1.0)</li>
+  <li><strong>Save directory</strong>: where recorded CSV sessions are stored</li>
+</ul>
+
+<h3>Burn-In</h3>
+<p><span class="tag info">System &rarr; Burn-In</span> New MOX sensors require a <strong>burn-in period</strong> (typically 24 hours) to stabilise their baseline resistance.</p>
+<ul>
+  <li>Persistent across app restarts (saves to QSettings)</li>
+  <li>Power-loss detection: if the app was closed, elapsed time is preserved</li>
+  <li>Adjustable duration (1&ndash;168 hours)</li>
+  <li><strong>Start / Stop</strong> toggle button with <strong>Resume</strong> support</li>
+  <li>Progress bar with HH:MM:SS countdown</li>
+  <li>When complete, sensors are marked as ready in the signal quality indicator</li>
+</ul>
+
+<h3>Plugins</h3>
+<p><span class="tag info">System &rarr; Plugins</span> Osmograph supports a plugin system for extending predictions. Plugins are Python scripts or model files dropped into the plugins folder (<code>~/.config/Osmograph/plugins/</code>).</p>
+<p>Each plugin exposes a <code>run(latent_vector) -> dict</code> function called on every prediction. The latent vector is the 187-dimensional feature vector.</p>
+<p>Example plugin:</p>
+<pre><code>def run(latent_vector):
+    return {"custom_score": float(latent_vector.mean())}</code></pre>
+<p>Use the Plugins sub-tab to discover, load, and reload plugins.</p>
+</section>
+
+<!-- ==================== FEATURES ==================== -->
+<section id="features">
+<h2>187-Dimensional Feature Reference</h2>
+<p>Osmograph extracts <strong>187 features</strong> from a 6-sensor array across five dimensions plus advanced metrics. For a 3-sensor setup, the count is proportionally smaller.</p>
+
+<h3>Device-Agnostic (6 per channel = 36)</h3>
+<table>
+  <tr><th>Feature</th><th>Meaning</th><th>Unit</th></tr>
+  <tr><td>relative_amplitude</td><td>Peak response magnitude (normalised)</td><td>dimensionless</td></tr>
+  <tr><td>direction</td><td>Response direction: +1 (n-type) or &minus;1 (p-type)</td><td>enum</td></tr>
+  <tr><td>rise_time</td><td>Time from 10% to 90% of peak</td><td>samples</td></tr>
+  <tr><td>decay_time</td><td>Time from peak to 63% recovery</td><td>samples</td></tr>
+  <tr><td>auc</td><td>Area under the response curve</td><td>dimensionless</td></tr>
+  <tr><td>endpoint_delta</td><td>Final offset from baseline at end of window</td><td>dimensionless</td></tr>
+</table>
+
+<h3>Absolute (4 per channel = 24)</h3>
+<table>
+  <tr><th>Feature</th><th>Meaning</th><th>Unit</th></tr>
+  <tr><td>raw_resistance</td><td>Raw sensor resistance (R<sub>S</sub>)</td><td>&Omega;</td></tr>
+  <tr><td>baseline_resistance</td><td>Baseline resistance in clean air (R<sub>0</sub>)</td><td>&Omega;</td></tr>
+  <tr><td>voltage</td><td>Voltage across sensor</td><td>V</td></tr>
+  <tr><td>calibrated_concentration</td><td>Estimated gas concentration (if calibrated)</td><td>ppm</td></tr>
+</table>
+
+<h3>Temporal (4 per channel = 24)</h3>
+<table>
+  <tr><th>Feature</th><th>Meaning</th></tr>
+  <tr><td>hf_transient</td><td>High-frequency transient energy</td></tr>
+  <tr><td>oscillation_freq</td><td>Dominant oscillation frequency in response</td></tr>
+  <tr><td>oscillation_amp</td><td>Amplitude of dominant oscillation</td></tr>
+  <tr><td>response_latency</td><td>Delay from stimulus onset to first detectable change</td></tr>
+</table>
+
+<h3>Health (4 per channel = 24)</h3>
+<table>
+  <tr><th>Feature</th><th>Meaning</th></tr>
+  <tr><td>drift_rate</td><td>Long-term baseline drift (resistance change per hour)</td></tr>
+  <tr><td>sensitivity_decay</td><td>Loss of response amplitude over repeated exposures</td></tr>
+  <tr><td>noise_floor</td><td>Baseline noise level (std dev during stable period)</td></tr>
+  <tr><td>hysteresis</td><td>Response difference between adsorption and desorption</td></tr>
+</table>
+
+<h3>Hardware (3 per channel = 18)</h3>
+<table>
+  <tr><th>Feature</th><th>Meaning</th></tr>
+  <tr><td>circuit_response</td><td>RC time constant of the sensor+load circuit</td></tr>
+  <tr><td>thermal_profile</td><td>Self-heating profile during operation</td></tr>
+  <tr><td>adc_noise</td><td>ADC quantisation noise level</td></tr>
+</table>
+
+<h3>Advanced (7 per channel = 42)</h3>
+<table>
+  <tr><th>Feature</th><th>Meaning</th></tr>
+  <tr><td>saturation_index</td><td>How close to saturation (0.0&ndash;1.0). 1.0 = fully saturated, no further response possible</td></tr>
+  <tr><td>decay_tau1, tau2, tau3</td><td>Multi-exponential decay time constants (fast, medium, slow kinetics)</td></tr>
+  <tr><td>decay_a1, a2, a3</td><td>Amplitude coefficients for each exponential component</td></tr>
+</table>
+
+<h3>Cross-Channel (15 ratios) + Global (4 metrics) = 19</h3>
+<p>Selectivity ratios between every pair of active channels, plus global metrics (max delta ratio, mean delta ratio, active channels count, total AUC).</p>
+
+<p>Total: 36 + 24 + 24 + 24 + 18 + 42 + 19 = <strong>187 features</strong> for a 6-sensor array.</p>
+</section>
+
+<!-- ==================== SDK ==================== -->
+<section id="sdk">
+<h2>Python SDK API</h2>
+<p>The <code>opensmell</code> Python package provides the core feature extraction and classification engine.</p>
+
+<h3>Basic Usage</h3>
+<pre><code>import opensmell
+result = opensmell.process("recording.csv")
+
+# Access results
+print(result.substance)        # "garlic"
+print(result.confidence)       # 0.94
+print(result.warning)          # "" or "Low confidence..."
+print(result.chemoprint[:5])   # First 5 of 29-dim chemoprint
+print(result.features[:10])    # First 10 of 187 feature values
+print(result.feature_names[:5]) # ["ch0_da_relative_amplitude", ...]
+</code></pre>
+
+<h3>Feature Extraction</h3>
+<pre><code>from opensmell.features import (
+    extract_all_framework_features,
+    compute_multi_exp_decay,
+    compute_saturation_index,
+)
+
+raw = opensmell.load_recording("recording.csv")
+features = extract_all_framework_features(raw)
+# Returns dict of 187 feature_name -> value
+</code></pre>
+
+<h3>Normalisation</h3>
+<pre><code>from opensmell.preprocessing import rs_r0_normalize
+normalised = rs_r0_normalize(raw_voltages, baseline_samples=30)
+# R_s / R_0 — mathematically cancels V_cc and R_L
+</code></pre>
+
+<h3>Command Line</h3>
+<pre><code>python -m opensmell path/to/recording.csv</code></pre>
+</section>
+
+<!-- ==================== PROTOCOL ==================== -->
+<section id="protocol">
+<h2>Recording Protocol</h2>
+<p>For reliable temporal features, follow this recording protocol:</p>
+
+<table>
+  <tr><th>Phase</th><th>Duration</th><th>Description</th></tr>
+  <tr><td>Baseline</td><td>30&ndash;60 s</td><td>Sensor in clean air to establish R<sub>0</sub></td></tr>
+  <tr><td>Exposure</td><td>30&ndash;60 s</td><td>Introduce the odour source near the sensor inlet</td></tr>
+  <tr><td>Recovery</td><td>60&ndash;180 s</td><td>Return to clean air; sensor recovers to baseline</td></tr>
+</table>
+
+<div class="card">
+<h4>Tips for Good Recordings</h4>
+<ul>
+  <li>Use a consistent distance from odour source to sensor inlet</li>
+  <li>Avoid cross-contamination between samples (ventilate between recordings)</li>
+  <li>Record at least 3 samples per substance for classifier training</li>
+  <li>Label immediately after recording while the sample context is clear</li>
+  <li>Monitor the signal quality indicator &mdash; wait for "Ready" before exposing</li>
+</ul>
+</div>
+</section>
+
+<!-- ==================== MENU ==================== -->
+<section id="menu">
+<h2>Menu Reference</h2>
+
+<h3>File</h3>
+<table>
+  <tr><th>Action</th><th>Shortcut</th><th>Description</th></tr>
+  <tr><td>Record Session</td><td>Ctrl+R</td><td>Start a new recording with label and duration</td></tr>
+  <tr><td>Export Sessions</td><td>&mdash;</td><td>Copy session CSV files to a folder</td></tr>
+  <tr><td>Export Fingerprint</td><td>Ctrl+E</td><td>Export the full 187-dim feature vector as JSON or CSV</td></tr>
+  <tr><td>Quit</td><td>Ctrl+Q</td><td>Exit Osmograph</td></tr>
+</table>
+
+<h3>Board</h3>
+<table>
+  <tr><th>Action</th><th>Shortcut</th><th>Description</th></tr>
+  <tr><td>Detect / Discover</td><td>Ctrl+D</td><td>Auto-detect ESP32 board (USB) or discover (WiFi)</td></tr>
+  <tr><td>Flash Firmware</td><td>Ctrl+F</td><td>Flash pre-compiled firmware to the board</td></tr>
+  <tr><td>Connect</td><td>Ctrl+C</td><td>Open serial/WiFi connection</td></tr>
+  <tr><td>Disconnect</td><td>&mdash;</td><td>Close the connection</td></tr>
+</table>
+
+<h3>Tools</h3>
+<table>
+  <tr><th>Action</th><th>Shortcut</th><th>Description</th></tr>
+  <tr><td>Adapter Wizard</td><td>Ctrl+W</td><td>Lightweight adapter training (Recordings &rarr; Adapter)</td></tr>
+  <tr><td>Pin Mapper</td><td>&mdash;</td><td>Customise ADC pin assignments and export firmware sketch</td></tr>
+  <tr><td>Reset Burn-In Timer</td><td>&mdash;</td><td>Reset the burn-in countdown to zero</td></tr>
+</table>
+
+<h3>View</h3>
+<table>
+  <tr><th>Action</th><th>Shortcut</th><th>Description</th></tr>
+  <tr><td>Toggle Fullscreen</td><td>F11</td><td>Fullscreen mode</td></tr>
+  <tr><td>Toggle Theme</td><td>Ctrl+T</td><td>Switch between HUD (Dark) and Clean (Light) themes</td></tr>
+</table>
+</section>
+
+<!-- ==================== SHORTCUTS ==================== -->
+<section id="shortcuts">
+<h2>Keyboard Shortcuts</h2>
+<table>
+  <tr><th>Shortcut</th><th>Action</th></tr>
+  <tr><td><span class="key">Ctrl+R</span></td><td>Record Session</td></tr>
+  <tr><td><span class="key">Ctrl+E</span></td><td>Export Fingerprint</td></tr>
+  <tr><td><span class="key">Ctrl+Q</span></td><td>Quit</td></tr>
+  <tr><td><span class="key">Ctrl+D</span></td><td>Detect Board / Discover WiFi</td></tr>
+  <tr><td><span class="key">Ctrl+F</span></td><td>Flash Firmware</td></tr>
+  <tr><td><span class="key">Ctrl+C</span></td><td>Connect</td></tr>
+  <tr><td><span class="key">Ctrl+W</span></td><td>Adapter Wizard</td></tr>
+  <tr><td><span class="key">F11</span></td><td>Toggle Fullscreen</td></tr>
+  <tr><td><span class="key">Ctrl+T</span></td><td>Toggle Theme</td></tr>
+</table>
+</section>
+
+<!-- ==================== TROUBLESHOOTING ==================== -->
+<section id="troubleshooting">
+<h2>Troubleshooting</h2>
+
+<div class="card">
+<h4>Board not detected</h4>
+<ul>
+  <li>Check the USB cable (data, not charge-only)</li>
+  <li>Install USB-to-serial drivers (CP2102 / CH340)</li>
+  <li>On Linux, add your user to the <code>dialout</code> group: <code>sudo usermod -a -G dialout $USER</code></li>
+  <li>Try a different USB port</li>
+</ul>
+</div>
+
+<div class="card">
+<h4>No data appearing on traces</h4>
+<ul>
+  <li>Verify the board is flashed with Osmograph firmware</li>
+  <li>Check the baud rate matches between firmware and app (default: 115200)</li>
+  <li>Try reconnecting</li>
+  <li>If using WiFi, verify the ESP32's IP address</li>
+</ul>
+</div>
+
+<div class="card">
+<h4>Noisy or erratic sensor readings</h4>
+<ul>
+  <li>Sensors may need burn-in (24h for new MQ sensors)</li>
+  <li>Check wiring: stable power, secure connections</li>
+  <li>Keep sensors away from drafts and airflow</li>
+  <li>R<sub>L</sub> value may need adjustment for your sensor model</li>
+</ul>
+</div>
+
+<div class="card">
+<h4>Classifier training fails or performs poorly</h4>
+<ul>
+  <li>Record at least 3 samples per substance</li>
+  <li>Ensure each recording follows the full protocol (baseline + exposure + recovery)</li>
+  <li>Verify sensor signals are stable (signal quality shows "Ready") before exposing</li>
+  <li>Try both RandomForest and LogisticRegression</li>
+</ul>
+</div>
+
+<div class="card">
+<h4>Fingerprint export is empty</h4>
+<ul>
+  <li>Process the recording with OpenSmell first (Recordings &rarr; Browse &rarr; Process)</li>
+  <li>Ensure the recording has sufficient samples (at least 50)</li>
+</ul>
+</div>
+</section>
+
+<!-- ==================== FAQ ==================== -->
+<section id="faq">
+<h2>FAQ</h2>
+
+<div class="card">
+<h4>Can I use this with sensors other than MQ series?</h4>
+<p>Yes, any analog gas sensor with a voltage output can be connected to the ESP32 ADC pins. The Rs/R0 normalisation is sensor-agnostic. You may need to adjust the load resistor and create a custom preset.</p>
+</div>
+
+<div class="card">
+<h4>Does it work with 3 sensors instead of 6?</h4>
+<p>Yes. Use the Pin Mapper to configure your sensor count. The UI adapts: traces show only the active sensors, features are computed only for populated channels, and the fingerprint radar adjusts its axes.</p>
+</div>
+
+<div class="card">
+<h4>Can I share my trained classifier with others?</h4>
+<p>Yes, classifiers are device-agnostic thanks to Rs/R0 normalisation. A model trained on one rig works on another (same sensor models). Share the .pkl file.</p>
+</div>
+
+<div class="card">
+<h4>What is the difference between Osmograph and the OpenSmell SDK?</h4>
+<p>The SDK (<code>opensmell</code>) is the core feature extraction and classification engine &mdash; a pure Python library with no GUI. Osmograph is the full desktop application that provides the UI, device connectivity, recording, and visualisation on top of the SDK.</p>
+</div>
+
+<div class="card">
+<h4>Is there a web version?</h4>
+<p>Not yet. Osmograph is a desktop application built with PySide6. A web/Streamlit platform is on the roadmap.</p>
+</div>
+
+<div class="card">
+<h4>How is this different from a commercial electronic nose?</h4>
+<p>Osmograph is open-source, device-agnostic, and built on a mathematically proven normalisation framework. Commercial e-noses are expensive, proprietary, and produce device-specific readings that cannot be compared across units. Osmograph solves the interoperability problem that has limited digital olfaction to lab settings.</p>
+</div>
+</section>
+
+  </div>
+</div>
+
+<script>
+// Theme toggle
+const themeToggle = document.getElementById('themeToggle');
+themeToggle.addEventListener('click', () => {
+  document.body.classList.toggle('light');
+  themeToggle.textContent = document.body.classList.contains('light') ? 'Dark Mode' : 'Light Mode';
+});
+
+// Active nav link tracking
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('#nav a');
+
+function updateActiveLink() {
+  let current = '';
+  sections.forEach(s => {
+    const top = s.getBoundingClientRect().top;
+    if (top < 200) current = s.id;
+  });
+  navLinks.forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+  });
+}
+window.addEventListener('scroll', updateActiveLink);
+updateActiveLink();
+
+// Basic search
+const search = document.getElementById('search');
+search.addEventListener('input', () => {
+  const q = search.value.toLowerCase();
+  const cards = document.querySelectorAll('.card, pre, p, li');
+  cards.forEach(el => {
+    if (!q) { el.style.opacity = '1'; return; }
+    el.style.opacity = el.textContent.toLowerCase().includes(q) ? '1' : '0.2';
+  });
+});
+</script>
+
+</body>
+</html>

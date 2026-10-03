@@ -3,8 +3,19 @@ import type {
   OsmellFile,
   SensorType,
 } from "./types"
-import { DEFAULT_R0_SAMPLES, DEFAULT_SYNTHETIC_RATE_HZ } from "./types"
-import { baselineForChannel, channelStats, normalizedSeries, std } from "./normalize"
+import {
+  DEFAULT_R0_DURATION_MS,
+  DEFAULT_R0_SAMPLES,
+  DEFAULT_SYNTHETIC_RATE_HZ,
+} from "./types"
+import {
+  baselineForChannel,
+  channelStats,
+  medianGapMs,
+  normalizedSeries,
+  samplesForDuration,
+  std,
+} from "./normalize"
 import { parseCsv } from "./csv"
 
 export interface MoxFeatures {
@@ -39,7 +50,9 @@ function firstCrossTime(
 
 export function processMox(file: OsmellFile): MoxProcessorResult {
   const channels = file.manifest.sensor.channels
-  const r0Samples = file.manifest.baseline?.r0Samples ?? DEFAULT_R0_SAMPLES
+  const r0Samples =
+    file.manifest.baseline?.r0Samples ??
+    samplesForDuration(DEFAULT_R0_DURATION_MS, medianGapMs(file.time), DEFAULT_R0_SAMPLES)
   const features: MoxFeatures[] = []
   const normalized: Record<string, number[]> = {}
 

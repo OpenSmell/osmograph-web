@@ -1,5 +1,6 @@
 import {
   DEFAULT_ADC_MAX,
+  DEFAULT_RECOVERY_DURATION_MS,
   FULL_SCORE_DURATION_S,
   GAP_TOLERANCE,
   MIN_SPAN_FRACTION,
@@ -16,7 +17,9 @@ import {
   channelStats,
   mean,
   median,
+  medianGapMs,
   normalizedSeries,
+  samplesForDuration,
 } from "./normalize"
 
 export interface QualityInput {
@@ -197,7 +200,12 @@ export function computeQuality(input: QualityInput): QualityReport {
       }
       const peak = Math.max(...norm.map((v) => Math.abs(v)))
       bestG.push(clamp(peak / noise / SNR_TARGET, 0, 1) * 100)
-      const finalWin = median(norm.slice(-15))
+      const recoverySamples = samplesForDuration(
+        DEFAULT_RECOVERY_DURATION_MS,
+        medianGapMs(file.time),
+        15,
+      )
+      const finalWin = median(norm.slice(-recoverySamples))
       const recovered = 1 - clamp(Math.abs(finalWin) / Math.max(peak, 1e-6), 0, 1)
       recoveryScores.push(100 * recovered)
     }

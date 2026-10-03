@@ -237,7 +237,7 @@ export function parseCsv(text: string): CsvParseResult {
       }
       rawTime = t
     } else {
-      rawTime = samples.length * 100
+      rawTime = samples.length * (1000 / DEFAULT_SYNTHETIC_RATE_HZ)
     }
 
     const values: Record<string, number | null> = {}

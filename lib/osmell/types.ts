@@ -195,6 +195,8 @@ export interface QualityReport {
 
 export const DEFAULT_ADC_MAX = 4095
 export const DEFAULT_R0_SAMPLES = 15
+export const DEFAULT_R0_DURATION_MS = 1500
+export const DEFAULT_RECOVERY_DURATION_MS = 1500
 export const DEAD_CV_THRESHOLD = 0.001
 export const NOISE_CV_LIMIT = 0.05
 export const SNR_TARGET = 10

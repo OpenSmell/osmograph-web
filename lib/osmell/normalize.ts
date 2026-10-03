@@ -1,4 +1,5 @@
 import {
+  DEFAULT_R0_DURATION_MS,
   DEFAULT_R0_SAMPLES,
   type ChannelStats,
   type OsmellFile,
@@ -46,6 +47,30 @@ export function r0FromSamples(values: number[], n = DEFAULT_R0_SAMPLES): number 
   return r0 > 0 ? r0 : mean(window.filter((v) => v > 0)) || 1
 }
 
+export function medianGapMs(time: number[]): number | null {
+  const gaps: number[] = []
+  for (let i = 0; i < time.length - 1; i++) {
+    const g = time[i + 1] - time[i]
+    if (g > 0) gaps.push(g)
+  }
+  return gaps.length > 0 ? median(gaps) : null
+}
+
+/**
+ * Convert a wall-clock window duration into a sample count at the file's real
+ * cadence. Falls back to `fallback` when no cadence is measurable. Keeps R0 /
+ * recovery windows cadence-invariant: 1.5 s of baseline is 15 samples at
+ * 10 Hz but only 3 at 2 Hz.
+ */
+export function samplesForDuration(
+  durationMs: number,
+  gapMs: number | null,
+  fallback: number,
+): number {
+  if (!(durationMs > 0) || gapMs === null || !(gapMs > 0)) return fallback
+  return Math.max(1, Math.round(durationMs / gapMs))
+}
+
 export interface BaselineResult {
   r0: number
   windowValues: number[]
@@ -58,7 +83,8 @@ export interface BaselineResult {
  * When the file carries an explicit baseline, R0 is the median of the whole
  * baseline channel. Otherwise we fall back to auto-R0: the median of the first
  * r0Samples of the target channel (SmellNet-style session invariance without a
- * dedicated baseline file).
+ * dedicated baseline file). The auto window defaults to 1.5 s of wall-clock
+ * (cadence-invariant); an explicit `r0Samples` in the manifest override wins.
  */
 export function baselineForChannel(
   file: OsmellFile,
@@ -67,7 +93,9 @@ export function baselineForChannel(
 ): BaselineResult {
   const baseline = file.manifest.baseline
   const source = baseline?.source ?? "none"
-  const r0Samples = baseline?.r0Samples ?? DEFAULT_R0_SAMPLES
+  const r0Samples =
+    baseline?.r0Samples ??
+    samplesForDuration(DEFAULT_R0_DURATION_MS, medianGapMs(file.time), DEFAULT_R0_SAMPLES)
 
   if (source === "explicit") {
     const b = file.data[channelId] ?? []
